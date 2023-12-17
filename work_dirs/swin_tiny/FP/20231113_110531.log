@@ -1,0 +1,1067 @@
+2023-11-13 11:05:32,101 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.17 | packaged by conda-forge | (default, Jun 16 2023, 07:06:00) [GCC 11.4.0]
+CUDA available: True
+GPU 0: NVIDIA GeForce RTX 3090
+CUDA_HOME: /usr/local/cuda-11.6
+NVCC: Build cuda_11.6.r11.6/compiler.31057947_0
+GCC: gcc (GCC) 7.3.0
+PyTorch: 1.8.0+cu111
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.1
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.0.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.1, CUDNN_VERSION=8.0.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0+cu111
+OpenCV: 4.8.0
+MMCV: 1.4.2
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMClassification: 0.24.0+
+------------------------------------------------------------
+
+2023-11-13 11:05:32,101 - mmcls - INFO - Distributed training: False
+2023-11-13 11:05:32,539 - mmcls - INFO - Config:
+train_data_root = '/data4/lj/forgery_Detect/Forgery_train_20231106'
+test_data_root = '/data4/lj/forgery_Detect/Forgery_test_20231106'
+work_dir = 'work_dirs/swin_tiny/FP'
+num_classes = 2
+batch_size = 70
+max_epochs = 200
+interval_save = 50
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(
+        type='SwinTransformer',
+        arch='tiny',
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint=
+            'pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth',
+            prefix='backbone'),
+        img_size=224,
+        drop_path_rate=0.2),
+    neck=dict(type='GlobalAveragePooling'),
+    head=dict(
+        type='LinearClsHead',
+        num_classes=2,
+        in_channels=768,
+        init_cfg=None,
+        loss=dict(type='FocalLoss', gamma=2.0, alpha=0.25, reduction='mean'),
+        cal_acc=False),
+    init_cfg=[
+        dict(type='TruncNormal', layer='Linear', std=0.02, bias=0.0),
+        dict(type='Constant', layer='LayerNorm', val=1.0, bias=0.0)
+    ])
+dataset_type = 'CustomDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Rotate', angle=8.0, interpolation='bicubic'),
+    dict(
+        type='Rotate',
+        angle=90.0,
+        interpolation='bicubic',
+        prob=0.1,
+        random_negative_prob=0.5),
+    dict(
+        type='Rotate',
+        angle=180.0,
+        interpolation='bicubic',
+        prob=0.1,
+        random_negative_prob=0.5),
+    dict(type='Resize', size=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', size=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=190,
+    workers_per_gpu=4,
+    train=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/forgery_Detect/Forgery_train_20231106',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Rotate', angle=8.0, interpolation='bicubic'),
+            dict(
+                type='Rotate',
+                angle=90.0,
+                interpolation='bicubic',
+                prob=0.1,
+                random_negative_prob=0.5),
+            dict(
+                type='Rotate',
+                angle=180.0,
+                interpolation='bicubic',
+                prob=0.1,
+                random_negative_prob=0.5),
+            dict(type='Resize', size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/forgery_Detect/Forgery_test_20231106',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/forgery_Detect/Forgery_test_20231106',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', size=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(interval=10, metric='accuracy')
+paramwise_cfg = dict(
+    norm_decay_mult=0.0,
+    bias_decay_mult=0.0,
+    custom_keys=dict({
+        '.absolute_pos_embed': dict(decay_mult=0.0),
+        '.relative_position_bias_table': dict(decay_mult=0.0)
+    }))
+optimizer = dict(
+    type='AdamW',
+    lr=0.001,
+    weight_decay=0.01,
+    eps=1e-08,
+    betas=(0.9, 0.999),
+    paramwise_cfg=dict(
+        norm_decay_mult=0.0,
+        bias_decay_mult=0.0,
+        custom_keys=dict({
+            '.absolute_pos_embed': dict(decay_mult=0.0),
+            '.relative_position_bias_table': dict(decay_mult=0.0)
+        })))
+optimizer_config = dict(grad_clip=dict(max_norm=5.0))
+lr_config = dict(
+    policy='CosineAnnealing',
+    by_epoch=False,
+    min_lr_ratio=0.005,
+    warmup='linear',
+    warmup_ratio=0.001,
+    warmup_iters=20,
+    warmup_by_epoch=True)
+runner = dict(type='EpochBasedRunner', max_epochs=200)
+checkpoint_config = dict(interval=10, save_optimizer=True)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+gpu_ids = [0]
+
+2023-11-13 11:05:32,555 - mmcls - INFO - Set random seed to 1025029845, deterministic: False
+2023-11-13 11:05:33,286 - mmcls - INFO - initialize ImageClassifier with init_cfg [{'type': 'TruncNormal', 'layer': 'Linear', 'std': 0.02, 'bias': 0.0}, {'type': 'Constant', 'layer': 'LayerNorm', 'val': 1.0, 'bias': 0.0}]
+2023-11-13 11:05:33,767 - mmcls - INFO - initialize SwinTransformer with init_cfg {'type': 'Pretrained', 'checkpoint': 'pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth', 'prefix': 'backbone'}
+Name of parameter - Initialization information
+
+backbone.patch_embed.projection.weight - torch.Size([96, 3, 4, 4]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.patch_embed.projection.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.patch_embed.norm.weight - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.patch_embed.norm.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.norm1.weight - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.norm1.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 3]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.qkv.weight - torch.Size([288, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.qkv.bias - torch.Size([288]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.proj.weight - torch.Size([96, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.proj.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.norm2.weight - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.norm2.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.0.0.weight - torch.Size([384, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.0.0.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.1.weight - torch.Size([96, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.1.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.norm1.weight - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.norm1.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 3]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.qkv.weight - torch.Size([288, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.qkv.bias - torch.Size([288]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.proj.weight - torch.Size([96, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.proj.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.norm2.weight - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.norm2.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.0.0.weight - torch.Size([384, 96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.0.0.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.1.weight - torch.Size([96, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.1.bias - torch.Size([96]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.downsample.norm.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.downsample.norm.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.0.downsample.reduction.weight - torch.Size([192, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.norm1.weight - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.norm1.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 6]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.qkv.weight - torch.Size([576, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.qkv.bias - torch.Size([576]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.proj.weight - torch.Size([192, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.proj.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.norm2.weight - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.norm2.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.0.0.weight - torch.Size([768, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.0.0.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.1.weight - torch.Size([192, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.1.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.norm1.weight - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.norm1.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 6]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.qkv.weight - torch.Size([576, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.qkv.bias - torch.Size([576]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.proj.weight - torch.Size([192, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.proj.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.norm2.weight - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.norm2.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.0.0.weight - torch.Size([768, 192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.0.0.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.1.weight - torch.Size([192, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.1.bias - torch.Size([192]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.downsample.norm.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.downsample.norm.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.1.downsample.reduction.weight - torch.Size([384, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.downsample.norm.weight - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.downsample.norm.bias - torch.Size([1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.2.downsample.reduction.weight - torch.Size([768, 1536]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.norm1.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.norm1.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 24]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.qkv.weight - torch.Size([2304, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.qkv.bias - torch.Size([2304]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.proj.weight - torch.Size([768, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.proj.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.norm2.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.norm2.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.0.0.weight - torch.Size([3072, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.0.0.bias - torch.Size([3072]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.1.weight - torch.Size([768, 3072]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.1.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.norm1.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.norm1.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 24]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.qkv.weight - torch.Size([2304, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.qkv.bias - torch.Size([2304]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.proj.weight - torch.Size([768, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.proj.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.norm2.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.norm2.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.0.0.weight - torch.Size([3072, 768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.0.0.bias - torch.Size([3072]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.1.weight - torch.Size([768, 3072]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.1.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.norm3.weight - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+backbone.norm3.bias - torch.Size([768]): 
+PretrainedInit: load from pretrain_model/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth 
+
+head.fc.weight - torch.Size([2, 768]): 
+TruncNormalInit: a=-2, b=2, mean=0, std=0.02, bias=0.0 
+
+head.fc.bias - torch.Size([2]): 
+TruncNormalInit: a=-2, b=2, mean=0, std=0.02, bias=0.0 
+2023-11-13 11:06:09,898 - mmcls - INFO - Start running, host: root@8F-02-37u-AItest29, work_dir: /data4/lj/Classification/1.7/work_dirs/swin_tiny/FP
+2023-11-13 11:06:09,899 - mmcls - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2023-11-13 11:06:09,900 - mmcls - INFO - workflow: [('train', 1)], max: 200 epochs
+2023-11-13 11:06:09,900 - mmcls - INFO - Checkpoints will be saved to /data4/lj/Classification/1.7/work_dirs/swin_tiny/FP by HardDiskBackend.
+2023-11-13 11:07:37,357 - mmcls - INFO - Epoch [1][50/433]	lr: 6.653e-06, eta: 1 day, 18:02:57, time: 1.749, data_time: 0.977, memory: 21508, loss: 0.1063, grad_norm: 1.0521
+2023-11-13 11:08:58,572 - mmcls - INFO - Epoch [1][100/433]	lr: 1.242e-05, eta: 1 day, 16:31:36, time: 1.624, data_time: 0.933, memory: 21508, loss: 0.0190, grad_norm: 0.3332
+2023-11-13 11:10:23,705 - mmcls - INFO - Epoch [1][150/433]	lr: 1.819e-05, eta: 1 day, 16:37:52, time: 1.703, data_time: 1.011, memory: 21508, loss: 0.0051, grad_norm: 0.2263
+2023-11-13 11:11:44,246 - mmcls - INFO - Epoch [1][200/433]	lr: 2.396e-05, eta: 1 day, 16:07:14, time: 1.611, data_time: 0.918, memory: 21508, loss: 0.0026, grad_norm: 0.1714
+2023-11-13 11:13:06,607 - mmcls - INFO - Epoch [1][250/433]	lr: 2.972e-05, eta: 1 day, 15:58:48, time: 1.647, data_time: 0.953, memory: 21508, loss: 0.0022, grad_norm: 0.1812
+2023-11-13 11:14:25,026 - mmcls - INFO - Epoch [1][300/433]	lr: 3.549e-05, eta: 1 day, 15:33:49, time: 1.568, data_time: 0.876, memory: 21508, loss: 0.0016, grad_norm: 0.1574
+2023-11-13 11:15:48,085 - mmcls - INFO - Epoch [1][350/433]	lr: 4.126e-05, eta: 1 day, 15:34:39, time: 1.661, data_time: 0.970, memory: 21508, loss: 0.0017, grad_norm: 0.1555
+2023-11-13 11:17:08,105 - mmcls - INFO - Epoch [1][400/433]	lr: 4.703e-05, eta: 1 day, 15:24:01, time: 1.600, data_time: 0.905, memory: 21508, loss: 0.0006, grad_norm: 0.0731
+2023-11-13 11:19:33,658 - mmcls - INFO - Epoch [2][50/433]	lr: 5.660e-05, eta: 1 day, 12:57:42, time: 1.762, data_time: 1.072, memory: 21508, loss: 0.0012, grad_norm: 0.1297
+2023-11-13 11:20:51,301 - mmcls - INFO - Epoch [2][100/433]	lr: 6.236e-05, eta: 1 day, 12:57:27, time: 1.553, data_time: 0.861, memory: 21508, loss: 0.0010, grad_norm: 0.0822
+2023-11-13 11:22:14,802 - mmcls - INFO - Epoch [2][150/433]	lr: 6.813e-05, eta: 1 day, 13:11:25, time: 1.670, data_time: 0.978, memory: 21508, loss: 0.0007, grad_norm: 0.0869
+2023-11-13 11:23:33,331 - mmcls - INFO - Epoch [2][200/433]	lr: 7.390e-05, eta: 1 day, 13:11:43, time: 1.571, data_time: 0.878, memory: 21508, loss: 0.0008, grad_norm: 0.1071
+2023-11-13 11:24:55,825 - mmcls - INFO - Epoch [2][250/433]	lr: 7.966e-05, eta: 1 day, 13:20:05, time: 1.650, data_time: 0.957, memory: 21508, loss: 0.0007, grad_norm: 0.0772
+2023-11-13 11:26:12,797 - mmcls - INFO - Epoch [2][300/433]	lr: 8.543e-05, eta: 1 day, 13:16:21, time: 1.539, data_time: 0.847, memory: 21508, loss: 0.0006, grad_norm: 0.0686
+2023-11-13 11:27:37,753 - mmcls - INFO - Epoch [2][350/433]	lr: 9.119e-05, eta: 1 day, 13:27:30, time: 1.699, data_time: 1.007, memory: 21508, loss: 0.0011, grad_norm: 0.0753
+2023-11-13 11:28:55,958 - mmcls - INFO - Epoch [2][400/433]	lr: 9.696e-05, eta: 1 day, 13:25:34, time: 1.564, data_time: 0.872, memory: 21508, loss: 0.0009, grad_norm: 0.0834
+2023-11-13 11:31:16,579 - mmcls - INFO - Epoch [3][50/433]	lr: 1.065e-04, eta: 1 day, 12:15:20, time: 1.735, data_time: 1.045, memory: 21508, loss: 0.0006, grad_norm: 0.0625
+2023-11-13 11:32:36,384 - mmcls - INFO - Epoch [3][100/433]	lr: 1.123e-04, eta: 1 day, 12:19:26, time: 1.596, data_time: 0.904, memory: 21508, loss: 0.0006, grad_norm: 0.0700
+2023-11-13 11:34:00,989 - mmcls - INFO - Epoch [3][150/433]	lr: 1.180e-04, eta: 1 day, 12:29:45, time: 1.692, data_time: 1.001, memory: 21508, loss: 0.0006, grad_norm: 0.0441
+2023-11-13 11:35:21,225 - mmcls - INFO - Epoch [3][200/433]	lr: 1.238e-04, eta: 1 day, 12:33:07, time: 1.605, data_time: 0.910, memory: 21508, loss: 0.0013, grad_norm: 0.0721
+2023-11-13 11:36:41,408 - mmcls - INFO - Epoch [3][250/433]	lr: 1.296e-04, eta: 1 day, 12:36:00, time: 1.604, data_time: 0.908, memory: 21508, loss: 0.0006, grad_norm: 0.0399
+2023-11-13 11:38:01,422 - mmcls - INFO - Epoch [3][300/433]	lr: 1.353e-04, eta: 1 day, 12:38:19, time: 1.600, data_time: 0.908, memory: 21508, loss: 0.0003, grad_norm: 0.0286
+2023-11-13 11:39:26,428 - mmcls - INFO - Epoch [3][350/433]	lr: 1.411e-04, eta: 1 day, 12:46:10, time: 1.700, data_time: 1.009, memory: 21508, loss: 0.0006, grad_norm: 0.0623
+2023-11-13 11:40:49,241 - mmcls - INFO - Epoch [3][400/433]	lr: 1.469e-04, eta: 1 day, 12:50:50, time: 1.656, data_time: 0.964, memory: 21508, loss: 0.0017, grad_norm: 0.1111
+2023-11-13 11:43:08,081 - mmcls - INFO - Epoch [4][50/433]	lr: 1.564e-04, eta: 1 day, 12:04:30, time: 1.741, data_time: 1.048, memory: 21508, loss: 0.0022, grad_norm: 0.1606
+2023-11-13 11:44:28,723 - mmcls - INFO - Epoch [4][100/433]	lr: 1.622e-04, eta: 1 day, 12:07:46, time: 1.613, data_time: 0.923, memory: 21508, loss: 0.0009, grad_norm: 0.0684
+2023-11-13 11:45:52,989 - mmcls - INFO - Epoch [4][150/433]	lr: 1.679e-04, eta: 1 day, 12:14:16, time: 1.685, data_time: 0.995, memory: 21508, loss: 0.0007, grad_norm: 0.0499
+2023-11-13 11:47:12,036 - mmcls - INFO - Epoch [4][200/433]	lr: 1.737e-04, eta: 1 day, 12:15:18, time: 1.581, data_time: 0.890, memory: 21508, loss: 0.0006, grad_norm: 0.0467
+2023-11-13 11:48:36,574 - mmcls - INFO - Epoch [4][250/433]	lr: 1.794e-04, eta: 1 day, 12:21:13, time: 1.691, data_time: 1.001, memory: 21508, loss: 0.0006, grad_norm: 0.0430
+2023-11-13 11:49:54,442 - mmcls - INFO - Epoch [4][300/433]	lr: 1.852e-04, eta: 1 day, 12:20:45, time: 1.557, data_time: 0.866, memory: 21508, loss: 0.0013, grad_norm: 0.0945
+2023-11-13 11:51:18,920 - mmcls - INFO - Epoch [4][350/433]	lr: 1.909e-04, eta: 1 day, 12:25:55, time: 1.690, data_time: 0.997, memory: 21508, loss: 0.0011, grad_norm: 0.0401
+2023-11-13 11:52:38,742 - mmcls - INFO - Epoch [4][400/433]	lr: 1.967e-04, eta: 1 day, 12:26:49, time: 1.596, data_time: 0.904, memory: 21508, loss: 0.0013, grad_norm: 0.0730
+2023-11-13 11:55:02,367 - mmcls - INFO - Epoch [5][50/433]	lr: 2.062e-04, eta: 1 day, 11:52:29, time: 1.754, data_time: 1.062, memory: 21508, loss: 0.0010, grad_norm: 0.0595
+2023-11-13 11:56:22,717 - mmcls - INFO - Epoch [5][100/433]	lr: 2.120e-04, eta: 1 day, 11:54:28, time: 1.607, data_time: 0.918, memory: 21508, loss: 0.0018, grad_norm: 0.0568
+2023-11-13 11:57:46,983 - mmcls - INFO - Epoch [5][150/433]	lr: 2.177e-04, eta: 1 day, 11:59:13, time: 1.685, data_time: 0.993, memory: 21508, loss: 0.0005, grad_norm: 0.0523
+2023-11-13 11:59:07,932 - mmcls - INFO - Epoch [5][200/433]	lr: 2.235e-04, eta: 1 day, 12:01:13, time: 1.619, data_time: 0.925, memory: 21508, loss: 0.0009, grad_norm: 0.1001
+2023-11-13 12:00:30,190 - mmcls - INFO - Epoch [5][250/433]	lr: 2.292e-04, eta: 1 day, 12:03:59, time: 1.645, data_time: 0.952, memory: 21508, loss: 0.0019, grad_norm: 0.1011
+2023-11-13 12:01:47,399 - mmcls - INFO - Epoch [5][300/433]	lr: 2.350e-04, eta: 1 day, 12:03:02, time: 1.544, data_time: 0.851, memory: 21508, loss: 0.0009, grad_norm: 0.0549
+2023-11-13 12:03:09,616 - mmcls - INFO - Epoch [5][350/433]	lr: 2.407e-04, eta: 1 day, 12:05:28, time: 1.644, data_time: 0.953, memory: 21508, loss: 0.0020, grad_norm: 0.1526
+2023-11-13 12:04:28,718 - mmcls - INFO - Epoch [5][400/433]	lr: 2.465e-04, eta: 1 day, 12:05:40, time: 1.582, data_time: 0.891, memory: 21508, loss: 0.0008, grad_norm: 0.0401
+2023-11-13 12:06:51,259 - mmcls - INFO - Epoch [6][50/433]	lr: 2.560e-04, eta: 1 day, 11:37:38, time: 1.738, data_time: 1.046, memory: 21508, loss: 0.0007, grad_norm: 0.0330
+2023-11-13 12:08:12,287 - mmcls - INFO - Epoch [6][100/433]	lr: 2.617e-04, eta: 1 day, 11:39:29, time: 1.621, data_time: 0.930, memory: 21508, loss: 0.0017, grad_norm: 0.0870
+2023-11-13 12:09:33,298 - mmcls - INFO - Epoch [6][150/433]	lr: 2.675e-04, eta: 1 day, 11:41:12, time: 1.620, data_time: 0.929, memory: 21508, loss: 0.0012, grad_norm: 0.0707
+2023-11-13 12:10:53,958 - mmcls - INFO - Epoch [6][200/433]	lr: 2.732e-04, eta: 1 day, 11:42:34, time: 1.613, data_time: 0.921, memory: 21508, loss: 0.0025, grad_norm: 0.1137
+2023-11-13 12:12:14,420 - mmcls - INFO - Epoch [6][250/433]	lr: 2.789e-04, eta: 1 day, 11:43:42, time: 1.609, data_time: 0.918, memory: 21508, loss: 0.0026, grad_norm: 0.0985
+2023-11-13 12:13:36,384 - mmcls - INFO - Epoch [6][300/433]	lr: 2.847e-04, eta: 1 day, 11:45:36, time: 1.639, data_time: 0.947, memory: 21508, loss: 0.0027, grad_norm: 0.0891
+2023-11-13 12:14:56,879 - mmcls - INFO - Epoch [6][350/433]	lr: 2.904e-04, eta: 1 day, 11:46:33, time: 1.610, data_time: 0.919, memory: 21508, loss: 0.0014, grad_norm: 0.0679
+2023-11-13 12:16:20,228 - mmcls - INFO - Epoch [6][400/433]	lr: 2.961e-04, eta: 1 day, 11:48:58, time: 1.667, data_time: 0.973, memory: 21508, loss: 0.0007, grad_norm: 0.0265
+2023-11-13 12:18:43,947 - mmcls - INFO - Epoch [7][50/433]	lr: 3.057e-04, eta: 1 day, 11:26:43, time: 1.785, data_time: 1.094, memory: 21508, loss: 0.0015, grad_norm: 0.1015
+2023-11-13 12:20:03,718 - mmcls - INFO - Epoch [7][100/433]	lr: 3.114e-04, eta: 1 day, 11:27:24, time: 1.595, data_time: 0.901, memory: 21508, loss: 0.0030, grad_norm: 0.1038
+2023-11-13 12:21:28,488 - mmcls - INFO - Epoch [7][150/433]	lr: 3.171e-04, eta: 1 day, 11:30:34, time: 1.695, data_time: 1.003, memory: 21508, loss: 0.0019, grad_norm: 0.0736
+2023-11-13 12:22:47,949 - mmcls - INFO - Epoch [7][200/433]	lr: 3.228e-04, eta: 1 day, 11:30:55, time: 1.589, data_time: 0.896, memory: 21508, loss: 0.0008, grad_norm: 0.0396
+2023-11-13 12:24:11,702 - mmcls - INFO - Epoch [7][250/433]	lr: 3.286e-04, eta: 1 day, 11:33:18, time: 1.675, data_time: 0.979, memory: 21508, loss: 0.0017, grad_norm: 0.0542
+2023-11-13 12:25:29,669 - mmcls - INFO - Epoch [7][300/433]	lr: 3.343e-04, eta: 1 day, 11:32:46, time: 1.559, data_time: 0.868, memory: 21508, loss: 0.0016, grad_norm: 0.0443
+2023-11-13 12:26:54,370 - mmcls - INFO - Epoch [7][350/433]	lr: 3.400e-04, eta: 1 day, 11:35:24, time: 1.694, data_time: 1.000, memory: 21508, loss: 0.0013, grad_norm: 0.0633
+2023-11-13 12:28:12,504 - mmcls - INFO - Epoch [7][400/433]	lr: 3.457e-04, eta: 1 day, 11:34:51, time: 1.563, data_time: 0.869, memory: 21508, loss: 0.0025, grad_norm: 0.1108
+2023-11-13 12:30:30,141 - mmcls - INFO - Epoch [8][50/433]	lr: 3.552e-04, eta: 1 day, 11:14:24, time: 1.732, data_time: 1.041, memory: 21508, loss: 0.0016, grad_norm: 0.0511
+2023-11-13 12:31:49,857 - mmcls - INFO - Epoch [8][100/433]	lr: 3.609e-04, eta: 1 day, 11:14:48, time: 1.594, data_time: 0.904, memory: 21508, loss: 0.0030, grad_norm: 0.1222
+2023-11-13 12:33:14,489 - mmcls - INFO - Epoch [8][150/433]	lr: 3.666e-04, eta: 1 day, 11:17:18, time: 1.693, data_time: 1.001, memory: 21508, loss: 0.0029, grad_norm: 0.0996
+2023-11-13 12:34:33,799 - mmcls - INFO - Epoch [8][200/433]	lr: 3.723e-04, eta: 1 day, 11:17:24, time: 1.586, data_time: 0.894, memory: 21508, loss: 0.0019, grad_norm: 0.0637
+2023-11-13 12:35:57,529 - mmcls - INFO - Epoch [8][250/433]	lr: 3.780e-04, eta: 1 day, 11:19:19, time: 1.675, data_time: 0.983, memory: 21508, loss: 0.0006, grad_norm: 0.0595
+2023-11-13 12:37:15,413 - mmcls - INFO - Epoch [8][300/433]	lr: 3.837e-04, eta: 1 day, 11:18:42, time: 1.558, data_time: 0.866, memory: 21508, loss: 0.0024, grad_norm: 0.0817
+2023-11-13 12:38:36,402 - mmcls - INFO - Epoch [8][350/433]	lr: 3.894e-04, eta: 1 day, 11:19:20, time: 1.620, data_time: 0.926, memory: 21508, loss: 0.0019, grad_norm: 0.0722
+2023-11-13 12:39:59,026 - mmcls - INFO - Epoch [8][400/433]	lr: 3.952e-04, eta: 1 day, 11:20:35, time: 1.652, data_time: 0.962, memory: 21508, loss: 0.0011, grad_norm: 0.0577
+2023-11-13 12:42:20,874 - mmcls - INFO - Epoch [9][50/433]	lr: 4.046e-04, eta: 1 day, 11:02:27, time: 1.727, data_time: 1.036, memory: 21508, loss: 0.0013, grad_norm: 0.0960
+2023-11-13 12:43:40,339 - mmcls - INFO - Epoch [9][100/433]	lr: 4.103e-04, eta: 1 day, 11:02:34, time: 1.589, data_time: 0.897, memory: 21508, loss: 0.0018, grad_norm: 0.0740
+2023-11-13 12:45:03,947 - mmcls - INFO - Epoch [9][150/433]	lr: 4.160e-04, eta: 1 day, 11:04:14, time: 1.672, data_time: 0.981, memory: 21508, loss: 0.0023, grad_norm: 0.0716
+2023-11-13 12:46:22,623 - mmcls - INFO - Epoch [9][200/433]	lr: 4.217e-04, eta: 1 day, 11:03:56, time: 1.574, data_time: 0.880, memory: 21508, loss: 0.0016, grad_norm: 0.0728
+2023-11-13 12:47:46,145 - mmcls - INFO - Epoch [9][250/433]	lr: 4.274e-04, eta: 1 day, 11:05:26, time: 1.670, data_time: 0.978, memory: 21508, loss: 0.0021, grad_norm: 0.0885
+2023-11-13 12:49:04,182 - mmcls - INFO - Epoch [9][300/433]	lr: 4.331e-04, eta: 1 day, 11:04:50, time: 1.561, data_time: 0.868, memory: 21508, loss: 0.0030, grad_norm: 0.0949
+2023-11-13 12:50:26,428 - mmcls - INFO - Epoch [9][350/433]	lr: 4.388e-04, eta: 1 day, 11:05:44, time: 1.645, data_time: 0.952, memory: 21508, loss: 0.0032, grad_norm: 0.0954
+2023-11-13 12:51:46,807 - mmcls - INFO - Epoch [9][400/433]	lr: 4.444e-04, eta: 1 day, 11:05:55, time: 1.608, data_time: 0.915, memory: 21508, loss: 0.0031, grad_norm: 0.0750
+2023-11-13 12:54:10,716 - mmcls - INFO - Epoch [10][50/433]	lr: 4.539e-04, eta: 1 day, 10:50:02, time: 1.746, data_time: 1.052, memory: 21508, loss: 0.0036, grad_norm: 0.0948
+2023-11-13 12:55:31,120 - mmcls - INFO - Epoch [10][100/433]	lr: 4.596e-04, eta: 1 day, 10:50:20, time: 1.608, data_time: 0.915, memory: 21508, loss: 0.0011, grad_norm: 0.0466
+2023-11-13 12:56:54,985 - mmcls - INFO - Epoch [10][150/433]	lr: 4.652e-04, eta: 1 day, 10:51:46, time: 1.677, data_time: 0.987, memory: 21508, loss: 0.0012, grad_norm: 0.0430
+2023-11-13 12:58:15,196 - mmcls - INFO - Epoch [10][200/433]	lr: 4.709e-04, eta: 1 day, 10:51:54, time: 1.604, data_time: 0.909, memory: 21508, loss: 0.0019, grad_norm: 0.0831
+2023-11-13 12:59:39,800 - mmcls - INFO - Epoch [10][250/433]	lr: 4.766e-04, eta: 1 day, 10:53:28, time: 1.692, data_time: 0.999, memory: 21508, loss: 0.0026, grad_norm: 0.0892
+2023-11-13 13:00:56,746 - mmcls - INFO - Epoch [10][300/433]	lr: 4.823e-04, eta: 1 day, 10:52:27, time: 1.539, data_time: 0.848, memory: 21508, loss: 0.0022, grad_norm: 0.0783
+2023-11-13 13:02:18,461 - mmcls - INFO - Epoch [10][350/433]	lr: 4.879e-04, eta: 1 day, 10:52:58, time: 1.634, data_time: 0.943, memory: 21508, loss: 0.0015, grad_norm: 0.0489
+2023-11-13 13:03:38,368 - mmcls - INFO - Epoch [10][400/433]	lr: 4.936e-04, eta: 1 day, 10:52:52, time: 1.598, data_time: 0.906, memory: 21508, loss: 0.0011, grad_norm: 0.0380
+2023-11-13 13:04:32,555 - mmcls - INFO - Saving checkpoint at 10 epochs
+2023-11-13 13:04:55,484 - mmcls - INFO - Epoch(val) [10][34]	accuracy_top-1: 99.8746, accuracy_top-2: 100.0000
+2023-11-13 13:06:22,405 - mmcls - INFO - Epoch [11][50/433]	lr: 5.030e-04, eta: 1 day, 10:38:20, time: 1.738, data_time: 1.046, memory: 21508, loss: 0.0018, grad_norm: 0.0768
+2023-11-13 13:07:40,551 - mmcls - INFO - Epoch [11][100/433]	lr: 5.086e-04, eta: 1 day, 10:37:47, time: 1.563, data_time: 0.870, memory: 21508, loss: 0.0033, grad_norm: 0.1130
+2023-11-13 13:09:04,005 - mmcls - INFO - Epoch [11][150/433]	lr: 5.143e-04, eta: 1 day, 10:38:50, time: 1.669, data_time: 0.976, memory: 21508, loss: 0.0018, grad_norm: 0.0520
+2023-11-13 13:10:22,858 - mmcls - INFO - Epoch [11][200/433]	lr: 5.199e-04, eta: 1 day, 10:38:27, time: 1.577, data_time: 0.885, memory: 21508, loss: 0.0020, grad_norm: 0.0581
+2023-11-13 13:11:46,003 - mmcls - INFO - Epoch [11][250/433]	lr: 5.256e-04, eta: 1 day, 10:39:19, time: 1.663, data_time: 0.969, memory: 21508, loss: 0.0013, grad_norm: 0.0551
+2023-11-13 13:13:03,677 - mmcls - INFO - Epoch [11][300/433]	lr: 5.312e-04, eta: 1 day, 10:38:32, time: 1.553, data_time: 0.859, memory: 21508, loss: 0.0034, grad_norm: 0.0958
+2023-11-13 13:14:25,402 - mmcls - INFO - Epoch [11][350/433]	lr: 5.369e-04, eta: 1 day, 10:38:55, time: 1.635, data_time: 0.941, memory: 21508, loss: 0.0022, grad_norm: 0.0626
+2023-11-13 13:15:45,763 - mmcls - INFO - Epoch [11][400/433]	lr: 5.425e-04, eta: 1 day, 10:38:52, time: 1.607, data_time: 0.913, memory: 21508, loss: 0.0035, grad_norm: 0.0916
+2023-11-13 13:18:08,494 - mmcls - INFO - Epoch [12][50/433]	lr: 5.519e-04, eta: 1 day, 10:26:02, time: 1.772, data_time: 1.080, memory: 21508, loss: 0.0013, grad_norm: 0.0410
+2023-11-13 13:19:28,568 - mmcls - INFO - Epoch [12][100/433]	lr: 5.575e-04, eta: 1 day, 10:25:58, time: 1.601, data_time: 0.910, memory: 21508, loss: 0.0015, grad_norm: 0.0396
+2023-11-13 13:20:54,141 - mmcls - INFO - Epoch [12][150/433]	lr: 5.632e-04, eta: 1 day, 10:27:25, time: 1.711, data_time: 1.018, memory: 21508, loss: 0.0039, grad_norm: 0.1510
+2023-11-13 13:22:14,298 - mmcls - INFO - Epoch [12][200/433]	lr: 5.688e-04, eta: 1 day, 10:27:18, time: 1.603, data_time: 0.909, memory: 21508, loss: 0.0040, grad_norm: 0.0962
+2023-11-13 13:23:38,234 - mmcls - INFO - Epoch [12][250/433]	lr: 5.744e-04, eta: 1 day, 10:28:12, time: 1.679, data_time: 0.985, memory: 21508, loss: 0.0043, grad_norm: 0.0912
+2023-11-13 13:24:55,389 - mmcls - INFO - Epoch [12][300/433]	lr: 5.800e-04, eta: 1 day, 10:27:14, time: 1.543, data_time: 0.851, memory: 21508, loss: 0.0032, grad_norm: 0.0735
+2023-11-13 13:26:17,391 - mmcls - INFO - Epoch [12][350/433]	lr: 5.857e-04, eta: 1 day, 10:27:32, time: 1.640, data_time: 0.948, memory: 21508, loss: 0.0012, grad_norm: 0.0418
+2023-11-13 13:27:37,987 - mmcls - INFO - Epoch [12][400/433]	lr: 5.913e-04, eta: 1 day, 10:27:27, time: 1.612, data_time: 0.920, memory: 21508, loss: 0.0017, grad_norm: 0.0490
+2023-11-13 13:29:58,841 - mmcls - INFO - Epoch [13][50/433]	lr: 6.006e-04, eta: 1 day, 10:14:50, time: 1.716, data_time: 1.023, memory: 21508, loss: 0.0046, grad_norm: 0.1032
+2023-11-13 13:31:17,641 - mmcls - INFO - Epoch [13][100/433]	lr: 6.062e-04, eta: 1 day, 10:14:21, time: 1.576, data_time: 0.883, memory: 21508, loss: 0.0030, grad_norm: 0.0743
+2023-11-13 13:32:41,859 - mmcls - INFO - Epoch [13][150/433]	lr: 6.118e-04, eta: 1 day, 10:15:13, time: 1.684, data_time: 0.993, memory: 21508, loss: 0.0015, grad_norm: 0.0392
+2023-11-13 13:34:01,024 - mmcls - INFO - Epoch [13][200/433]	lr: 6.174e-04, eta: 1 day, 10:14:47, time: 1.583, data_time: 0.890, memory: 21508, loss: 0.0027, grad_norm: 0.0557
+2023-11-13 13:35:25,774 - mmcls - INFO - Epoch [13][250/433]	lr: 6.230e-04, eta: 1 day, 10:15:42, time: 1.695, data_time: 1.002, memory: 21508, loss: 0.0015, grad_norm: 0.0419
+2023-11-13 13:36:43,524 - mmcls - INFO - Epoch [13][300/433]	lr: 6.286e-04, eta: 1 day, 10:14:52, time: 1.555, data_time: 0.862, memory: 21508, loss: 0.0011, grad_norm: 0.0319
+2023-11-13 13:38:05,166 - mmcls - INFO - Epoch [13][350/433]	lr: 6.342e-04, eta: 1 day, 10:14:59, time: 1.633, data_time: 0.941, memory: 21508, loss: 0.0018, grad_norm: 0.0624
+2023-11-13 13:39:24,921 - mmcls - INFO - Epoch [13][400/433]	lr: 6.398e-04, eta: 1 day, 10:14:36, time: 1.595, data_time: 0.902, memory: 21508, loss: 0.0010, grad_norm: 0.0322
+2023-11-13 13:41:46,305 - mmcls - INFO - Epoch [14][50/433]	lr: 6.491e-04, eta: 1 day, 10:03:15, time: 1.747, data_time: 1.055, memory: 21508, loss: 0.0005, grad_norm: 0.0160
+2023-11-13 13:43:06,904 - mmcls - INFO - Epoch [14][100/433]	lr: 6.547e-04, eta: 1 day, 10:03:07, time: 1.612, data_time: 0.920, memory: 21508, loss: 0.0038, grad_norm: 0.1041
+2023-11-13 13:44:27,413 - mmcls - INFO - Epoch [14][150/433]	lr: 6.603e-04, eta: 1 day, 10:02:58, time: 1.610, data_time: 0.918, memory: 21508, loss: 0.0019, grad_norm: 0.0445
+2023-11-13 13:45:50,508 - mmcls - INFO - Epoch [14][200/433]	lr: 6.658e-04, eta: 1 day, 10:03:22, time: 1.662, data_time: 0.968, memory: 21508, loss: 0.0027, grad_norm: 0.0667
+2023-11-13 13:47:10,117 - mmcls - INFO - Epoch [14][250/433]	lr: 6.714e-04, eta: 1 day, 10:02:57, time: 1.592, data_time: 0.899, memory: 21508, loss: 0.0011, grad_norm: 0.0311
+2023-11-13 13:48:31,880 - mmcls - INFO - Epoch [14][300/433]	lr: 6.770e-04, eta: 1 day, 10:03:01, time: 1.635, data_time: 0.943, memory: 21508, loss: 0.0016, grad_norm: 0.0534
+2023-11-13 13:49:51,315 - mmcls - INFO - Epoch [14][350/433]	lr: 6.826e-04, eta: 1 day, 10:02:32, time: 1.589, data_time: 0.897, memory: 21508, loss: 0.0040, grad_norm: 0.0866
+2023-11-13 13:51:11,509 - mmcls - INFO - Epoch [14][400/433]	lr: 6.881e-04, eta: 1 day, 10:02:11, time: 1.604, data_time: 0.912, memory: 21508, loss: 0.0021, grad_norm: 0.0628
+2023-11-13 13:53:32,392 - mmcls - INFO - Epoch [15][50/433]	lr: 6.974e-04, eta: 1 day, 9:51:53, time: 1.776, data_time: 1.084, memory: 21508, loss: 0.0047, grad_norm: 0.1123
+2023-11-13 13:54:51,233 - mmcls - INFO - Epoch [15][100/433]	lr: 7.029e-04, eta: 1 day, 9:51:17, time: 1.577, data_time: 0.885, memory: 21508, loss: 0.0040, grad_norm: 0.0808
+2023-11-13 13:56:16,277 - mmcls - INFO - Epoch [15][150/433]	lr: 7.085e-04, eta: 1 day, 9:52:02, time: 1.701, data_time: 1.007, memory: 21508, loss: 0.0033, grad_norm: 0.0894
+2023-11-13 13:57:35,823 - mmcls - INFO - Epoch [15][200/433]	lr: 7.140e-04, eta: 1 day, 9:51:34, time: 1.591, data_time: 0.897, memory: 21508, loss: 0.0029, grad_norm: 0.0678
+2023-11-13 13:58:58,972 - mmcls - INFO - Epoch [15][250/433]	lr: 7.196e-04, eta: 1 day, 9:51:50, time: 1.663, data_time: 0.969, memory: 21508, loss: 0.0035, grad_norm: 0.0811
+2023-11-13 14:00:17,184 - mmcls - INFO - Epoch [15][300/433]	lr: 7.251e-04, eta: 1 day, 9:51:03, time: 1.564, data_time: 0.871, memory: 21508, loss: 0.0025, grad_norm: 0.0573
+2023-11-13 14:01:39,953 - mmcls - INFO - Epoch [15][350/433]	lr: 7.306e-04, eta: 1 day, 9:51:13, time: 1.655, data_time: 0.964, memory: 21508, loss: 0.0031, grad_norm: 0.0744
+2023-11-13 14:03:01,414 - mmcls - INFO - Epoch [15][400/433]	lr: 7.362e-04, eta: 1 day, 9:51:05, time: 1.629, data_time: 0.935, memory: 21508, loss: 0.0020, grad_norm: 0.0668
+2023-11-13 14:05:25,089 - mmcls - INFO - Epoch [16][50/433]	lr: 7.454e-04, eta: 1 day, 9:41:13, time: 1.763, data_time: 1.070, memory: 21508, loss: 0.0013, grad_norm: 0.0284
+2023-11-13 14:07:00,199 - mmcls - INFO - Epoch [16][100/433]	lr: 7.509e-04, eta: 1 day, 9:43:52, time: 1.902, data_time: 1.209, memory: 21508, loss: 0.0011, grad_norm: 0.0257
+2023-11-13 14:08:52,265 - mmcls - INFO - Epoch [16][150/433]	lr: 7.564e-04, eta: 1 day, 9:49:51, time: 2.241, data_time: 1.545, memory: 21508, loss: 0.0022, grad_norm: 0.0470
+2023-11-13 14:10:16,469 - mmcls - INFO - Epoch [16][200/433]	lr: 7.619e-04, eta: 1 day, 9:50:11, time: 1.684, data_time: 0.989, memory: 21508, loss: 0.0013, grad_norm: 0.0446
+2023-11-13 14:11:40,762 - mmcls - INFO - Epoch [16][250/433]	lr: 7.674e-04, eta: 1 day, 9:50:31, time: 1.686, data_time: 0.993, memory: 21508, loss: 0.0022, grad_norm: 0.0607
+2023-11-13 14:13:00,208 - mmcls - INFO - Epoch [16][300/433]	lr: 7.729e-04, eta: 1 day, 9:49:51, time: 1.589, data_time: 0.896, memory: 21508, loss: 0.0040, grad_norm: 0.0799
+2023-11-13 14:14:23,557 - mmcls - INFO - Epoch [16][350/433]	lr: 7.785e-04, eta: 1 day, 9:49:57, time: 1.667, data_time: 0.974, memory: 21508, loss: 0.0061, grad_norm: 0.1412
+2023-11-13 14:15:44,598 - mmcls - INFO - Epoch [16][400/433]	lr: 7.840e-04, eta: 1 day, 9:49:35, time: 1.621, data_time: 0.928, memory: 21508, loss: 0.0069, grad_norm: 0.1312
+2023-11-13 14:18:09,340 - mmcls - INFO - Epoch [17][50/433]	lr: 7.931e-04, eta: 1 day, 9:40:07, time: 1.763, data_time: 1.072, memory: 21508, loss: 0.0273, grad_norm: 0.4558
+2023-11-13 14:19:29,510 - mmcls - INFO - Epoch [17][100/433]	lr: 7.986e-04, eta: 1 day, 9:39:37, time: 1.603, data_time: 0.913, memory: 21508, loss: 0.0144, grad_norm: 0.2409
+2023-11-13 14:20:53,215 - mmcls - INFO - Epoch [17][150/433]	lr: 8.041e-04, eta: 1 day, 9:39:46, time: 1.674, data_time: 0.984, memory: 21508, loss: 0.0076, grad_norm: 0.1224
+2023-11-13 14:22:11,807 - mmcls - INFO - Epoch [17][200/433]	lr: 8.095e-04, eta: 1 day, 9:38:56, time: 1.572, data_time: 0.879, memory: 21508, loss: 0.0068, grad_norm: 0.1084
+2023-11-13 14:23:36,022 - mmcls - INFO - Epoch [17][250/433]	lr: 8.150e-04, eta: 1 day, 9:39:09, time: 1.684, data_time: 0.992, memory: 21508, loss: 0.0057, grad_norm: 0.0835
+2023-11-13 14:24:55,138 - mmcls - INFO - Epoch [17][300/433]	lr: 8.205e-04, eta: 1 day, 9:38:24, time: 1.582, data_time: 0.890, memory: 21508, loss: 0.0030, grad_norm: 0.0525
+2023-11-13 14:26:19,174 - mmcls - INFO - Epoch [17][350/433]	lr: 8.260e-04, eta: 1 day, 9:38:32, time: 1.681, data_time: 0.989, memory: 21508, loss: 0.0030, grad_norm: 0.0627
+2023-11-13 14:27:38,919 - mmcls - INFO - Epoch [17][400/433]	lr: 8.314e-04, eta: 1 day, 9:37:52, time: 1.595, data_time: 0.904, memory: 21508, loss: 0.0019, grad_norm: 0.0533
+2023-11-13 14:30:07,661 - mmcls - INFO - Epoch [18][50/433]	lr: 8.405e-04, eta: 1 day, 9:29:03, time: 1.781, data_time: 1.091, memory: 21508, loss: 0.0046, grad_norm: 0.1007
+2023-11-13 14:31:27,825 - mmcls - INFO - Epoch [18][100/433]	lr: 8.460e-04, eta: 1 day, 9:28:29, time: 1.603, data_time: 0.913, memory: 21508, loss: 0.0030, grad_norm: 0.0772
+2023-11-13 14:32:49,348 - mmcls - INFO - Epoch [18][150/433]	lr: 8.514e-04, eta: 1 day, 9:28:10, time: 1.630, data_time: 0.939, memory: 21508, loss: 0.0058, grad_norm: 0.0935
+2023-11-13 14:34:09,162 - mmcls - INFO - Epoch [18][200/433]	lr: 8.569e-04, eta: 1 day, 9:27:32, time: 1.596, data_time: 0.907, memory: 21508, loss: 0.0023, grad_norm: 0.0681
+2023-11-13 14:35:31,939 - mmcls - INFO - Epoch [18][250/433]	lr: 8.623e-04, eta: 1 day, 9:27:24, time: 1.656, data_time: 0.965, memory: 21508, loss: 0.0026, grad_norm: 0.0566
+2023-11-13 14:36:50,696 - mmcls - INFO - Epoch [18][300/433]	lr: 8.678e-04, eta: 1 day, 9:26:34, time: 1.575, data_time: 0.883, memory: 21508, loss: 0.0035, grad_norm: 0.0634
+2023-11-13 14:38:11,898 - mmcls - INFO - Epoch [18][350/433]	lr: 8.732e-04, eta: 1 day, 9:26:08, time: 1.624, data_time: 0.930, memory: 21508, loss: 0.0026, grad_norm: 0.0531
+2023-11-13 14:39:31,048 - mmcls - INFO - Epoch [18][400/433]	lr: 8.786e-04, eta: 1 day, 9:25:21, time: 1.583, data_time: 0.890, memory: 21508, loss: 0.0020, grad_norm: 0.0410
+2023-11-13 14:41:53,379 - mmcls - INFO - Epoch [19][50/433]	lr: 8.876e-04, eta: 1 day, 9:16:34, time: 1.737, data_time: 1.044, memory: 21508, loss: 0.0026, grad_norm: 0.0551
+2023-11-13 14:43:13,758 - mmcls - INFO - Epoch [19][100/433]	lr: 8.931e-04, eta: 1 day, 9:16:01, time: 1.608, data_time: 0.915, memory: 21508, loss: 0.0010, grad_norm: 0.0255
+2023-11-13 14:44:32,431 - mmcls - INFO - Epoch [19][150/433]	lr: 8.985e-04, eta: 1 day, 9:15:11, time: 1.573, data_time: 0.879, memory: 21508, loss: 0.0012, grad_norm: 0.0295
+2023-11-13 14:45:53,931 - mmcls - INFO - Epoch [19][200/433]	lr: 9.039e-04, eta: 1 day, 9:14:48, time: 1.630, data_time: 0.938, memory: 21508, loss: 0.0014, grad_norm: 0.0377
+2023-11-13 14:47:15,495 - mmcls - INFO - Epoch [19][250/433]	lr: 9.093e-04, eta: 1 day, 9:14:25, time: 1.631, data_time: 0.938, memory: 21508, loss: 0.0020, grad_norm: 0.0405
+2023-11-13 14:48:37,197 - mmcls - INFO - Epoch [19][300/433]	lr: 9.147e-04, eta: 1 day, 9:14:02, time: 1.634, data_time: 0.942, memory: 21508, loss: 0.0019, grad_norm: 0.0611
+2023-11-13 14:49:58,579 - mmcls - INFO - Epoch [19][350/433]	lr: 9.201e-04, eta: 1 day, 9:13:36, time: 1.628, data_time: 0.935, memory: 21508, loss: 0.0031, grad_norm: 0.0796
+2023-11-13 14:51:20,449 - mmcls - INFO - Epoch [19][400/433]	lr: 9.255e-04, eta: 1 day, 9:13:14, time: 1.637, data_time: 0.945, memory: 21508, loss: 0.0033, grad_norm: 0.0661
+2023-11-13 14:53:40,124 - mmcls - INFO - Epoch [20][50/433]	lr: 9.344e-04, eta: 1 day, 9:04:48, time: 1.732, data_time: 1.039, memory: 21508, loss: 0.0018, grad_norm: 0.0423
+2023-11-13 14:55:01,045 - mmcls - INFO - Epoch [20][100/433]	lr: 9.398e-04, eta: 1 day, 9:04:18, time: 1.618, data_time: 0.926, memory: 21508, loss: 0.0032, grad_norm: 0.0726
+2023-11-13 14:56:21,792 - mmcls - INFO - Epoch [20][150/433]	lr: 9.452e-04, eta: 1 day, 9:03:46, time: 1.615, data_time: 0.923, memory: 21508, loss: 0.0028, grad_norm: 0.0565
+2023-11-13 14:57:46,288 - mmcls - INFO - Epoch [20][200/433]	lr: 9.506e-04, eta: 1 day, 9:03:48, time: 1.690, data_time: 0.998, memory: 21508, loss: 0.0019, grad_norm: 0.0562
+2023-11-13 14:59:05,407 - mmcls - INFO - Epoch [20][250/433]	lr: 9.559e-04, eta: 1 day, 9:02:59, time: 1.582, data_time: 0.891, memory: 21508, loss: 0.0065, grad_norm: 0.1263
+2023-11-13 15:00:30,007 - mmcls - INFO - Epoch [20][300/433]	lr: 9.613e-04, eta: 1 day, 9:03:01, time: 1.692, data_time: 1.000, memory: 21508, loss: 0.0054, grad_norm: 0.1254
+2023-11-13 15:01:48,466 - mmcls - INFO - Epoch [20][350/433]	lr: 9.667e-04, eta: 1 day, 9:02:05, time: 1.569, data_time: 0.875, memory: 21508, loss: 0.0073, grad_norm: 0.1279
+2023-11-13 15:03:11,716 - mmcls - INFO - Epoch [20][400/433]	lr: 9.720e-04, eta: 1 day, 9:01:52, time: 1.664, data_time: 0.973, memory: 21508, loss: 0.0059, grad_norm: 0.1006
+2023-11-13 15:04:05,275 - mmcls - INFO - Saving checkpoint at 20 epochs
+2023-11-13 15:04:28,716 - mmcls - INFO - Epoch(val) [20][34]	accuracy_top-1: 99.7022, accuracy_top-2: 100.0000
+2023-11-13 15:05:57,704 - mmcls - INFO - Epoch [21][50/433]	lr: 9.754e-04, eta: 1 day, 8:54:09, time: 1.780, data_time: 1.088, memory: 21508, loss: 0.0052, grad_norm: 0.1054
+2023-11-13 15:07:18,313 - mmcls - INFO - Epoch [21][100/433]	lr: 9.751e-04, eta: 1 day, 8:53:34, time: 1.612, data_time: 0.918, memory: 21508, loss: 0.0058, grad_norm: 0.1092
+2023-11-13 15:08:43,123 - mmcls - INFO - Epoch [21][150/433]	lr: 9.748e-04, eta: 1 day, 8:53:35, time: 1.696, data_time: 1.006, memory: 21508, loss: 0.0064, grad_norm: 0.1067
+2023-11-13 15:10:03,568 - mmcls - INFO - Epoch [21][200/433]	lr: 9.745e-04, eta: 1 day, 8:52:57, time: 1.609, data_time: 0.915, memory: 21508, loss: 0.0046, grad_norm: 0.0777
+2023-11-13 15:11:27,167 - mmcls - INFO - Epoch [21][250/433]	lr: 9.742e-04, eta: 1 day, 8:52:46, time: 1.672, data_time: 0.978, memory: 21508, loss: 0.0056, grad_norm: 0.1200
+2023-11-13 15:12:45,240 - mmcls - INFO - Epoch [21][300/433]	lr: 9.740e-04, eta: 1 day, 8:51:46, time: 1.561, data_time: 0.870, memory: 21508, loss: 0.0034, grad_norm: 0.0615
+2023-11-13 15:14:10,461 - mmcls - INFO - Epoch [21][350/433]	lr: 9.737e-04, eta: 1 day, 8:51:48, time: 1.704, data_time: 1.010, memory: 21508, loss: 0.0039, grad_norm: 0.0848
+2023-11-13 15:15:31,402 - mmcls - INFO - Epoch [21][400/433]	lr: 9.734e-04, eta: 1 day, 8:51:12, time: 1.619, data_time: 0.927, memory: 21508, loss: 0.0138, grad_norm: 0.2451
+2023-11-13 15:17:57,625 - mmcls - INFO - Epoch [22][50/433]	lr: 9.729e-04, eta: 1 day, 8:44:01, time: 1.814, data_time: 1.122, memory: 21508, loss: 0.0060, grad_norm: 0.0959
+2023-11-13 15:19:18,360 - mmcls - INFO - Epoch [22][100/433]	lr: 9.726e-04, eta: 1 day, 8:43:24, time: 1.615, data_time: 0.923, memory: 21508, loss: 0.0044, grad_norm: 0.0700
+2023-11-13 15:20:45,650 - mmcls - INFO - Epoch [22][150/433]	lr: 9.723e-04, eta: 1 day, 8:43:42, time: 1.746, data_time: 1.054, memory: 21508, loss: 0.0042, grad_norm: 0.0888
+2023-11-13 15:22:09,780 - mmcls - INFO - Epoch [22][200/433]	lr: 9.720e-04, eta: 1 day, 8:43:32, time: 1.683, data_time: 0.989, memory: 21508, loss: 0.0048, grad_norm: 0.1022
+2023-11-13 15:23:36,187 - mmcls - INFO - Epoch [22][250/433]	lr: 9.717e-04, eta: 1 day, 8:43:40, time: 1.728, data_time: 1.035, memory: 21508, loss: 0.0059, grad_norm: 0.1129
+2023-11-13 15:24:55,936 - mmcls - INFO - Epoch [22][300/433]	lr: 9.714e-04, eta: 1 day, 8:42:53, time: 1.595, data_time: 0.902, memory: 21508, loss: 0.0042, grad_norm: 0.0759
+2023-11-13 15:26:22,218 - mmcls - INFO - Epoch [22][350/433]	lr: 9.711e-04, eta: 1 day, 8:42:58, time: 1.726, data_time: 1.031, memory: 21508, loss: 0.0042, grad_norm: 0.0750
+2023-11-13 15:27:54,800 - mmcls - INFO - Epoch [22][400/433]	lr: 9.708e-04, eta: 1 day, 8:43:54, time: 1.852, data_time: 1.160, memory: 21508, loss: 0.0030, grad_norm: 0.0498
+2023-11-13 15:30:20,251 - mmcls - INFO - Epoch [23][50/433]	lr: 9.703e-04, eta: 1 day, 8:36:19, time: 1.721, data_time: 1.029, memory: 21508, loss: 0.0028, grad_norm: 0.0639
+2023-11-13 15:31:39,983 - mmcls - INFO - Epoch [23][100/433]	lr: 9.700e-04, eta: 1 day, 8:35:31, time: 1.595, data_time: 0.901, memory: 21508, loss: 0.0027, grad_norm: 0.0475
+2023-11-13 15:33:03,899 - mmcls - INFO - Epoch [23][150/433]	lr: 9.697e-04, eta: 1 day, 8:35:16, time: 1.678, data_time: 0.987, memory: 21508, loss: 0.0017, grad_norm: 0.0347
+2023-11-13 15:34:21,010 - mmcls - INFO - Epoch [23][200/433]	lr: 9.694e-04, eta: 1 day, 8:34:07, time: 1.542, data_time: 0.850, memory: 21508, loss: 0.0039, grad_norm: 0.1155
+2023-11-13 15:35:43,341 - mmcls - INFO - Epoch [23][250/433]	lr: 9.690e-04, eta: 1 day, 8:33:38, time: 1.647, data_time: 0.956, memory: 21508, loss: 0.0062, grad_norm: 0.1000
+2023-11-13 15:37:00,721 - mmcls - INFO - Epoch [23][300/433]	lr: 9.687e-04, eta: 1 day, 8:32:30, time: 1.548, data_time: 0.856, memory: 21508, loss: 0.0037, grad_norm: 0.0753
+2023-11-13 15:38:23,583 - mmcls - INFO - Epoch [23][350/433]	lr: 9.684e-04, eta: 1 day, 8:32:05, time: 1.657, data_time: 0.953, memory: 21508, loss: 0.0026, grad_norm: 0.0459
+2023-11-13 15:39:43,392 - mmcls - INFO - Epoch [23][400/433]	lr: 9.681e-04, eta: 1 day, 8:31:16, time: 1.596, data_time: 0.904, memory: 21508, loss: 0.0031, grad_norm: 0.0782
+2023-11-13 15:42:07,255 - mmcls - INFO - Epoch [24][50/433]	lr: 9.676e-04, eta: 1 day, 8:24:06, time: 1.742, data_time: 1.052, memory: 21508, loss: 0.0025, grad_norm: 0.0651
+2023-11-13 15:43:28,604 - mmcls - INFO - Epoch [24][100/433]	lr: 9.672e-04, eta: 1 day, 8:23:29, time: 1.627, data_time: 0.937, memory: 21508, loss: 0.0019, grad_norm: 0.0461
+2023-11-13 15:44:51,032 - mmcls - INFO - Epoch [24][150/433]	lr: 9.669e-04, eta: 1 day, 8:23:00, time: 1.649, data_time: 0.955, memory: 21508, loss: 0.0042, grad_norm: 0.0792
+2023-11-13 15:46:08,751 - mmcls - INFO - Epoch [24][200/433]	lr: 9.666e-04, eta: 1 day, 8:21:55, time: 1.554, data_time: 0.861, memory: 21508, loss: 0.0047, grad_norm: 0.0810
+2023-11-13 15:47:32,997 - mmcls - INFO - Epoch [24][250/433]	lr: 9.663e-04, eta: 1 day, 8:21:39, time: 1.685, data_time: 0.991, memory: 21508, loss: 0.0060, grad_norm: 0.1831
+2023-11-13 15:48:48,775 - mmcls - INFO - Epoch [24][300/433]	lr: 9.659e-04, eta: 1 day, 8:20:19, time: 1.516, data_time: 0.821, memory: 21508, loss: 0.0110, grad_norm: 0.1756
+2023-11-13 15:50:10,361 - mmcls - INFO - Epoch [24][350/433]	lr: 9.656e-04, eta: 1 day, 8:19:43, time: 1.632, data_time: 0.940, memory: 21508, loss: 0.0043, grad_norm: 0.0557
+2023-11-13 15:51:37,017 - mmcls - INFO - Epoch [24][400/433]	lr: 9.653e-04, eta: 1 day, 8:19:43, time: 1.733, data_time: 1.042, memory: 21508, loss: 0.0034, grad_norm: 0.0518
+2023-11-13 15:54:56,236 - mmcls - INFO - Epoch [25][50/433]	lr: 9.647e-04, eta: 1 day, 8:13:16, time: 1.821, data_time: 1.131, memory: 21508, loss: 0.0046, grad_norm: 0.0826
+2023-11-13 15:57:00,613 - mmcls - INFO - Epoch [25][100/433]	lr: 9.644e-04, eta: 1 day, 8:17:50, time: 2.488, data_time: 1.796, memory: 21508, loss: 0.0064, grad_norm: 0.1511
+2023-11-13 16:00:33,740 - mmcls - INFO - Epoch [25][150/433]	lr: 9.641e-04, eta: 1 day, 8:33:00, time: 4.263, data_time: 3.570, memory: 21508, loss: 0.0050, grad_norm: 0.0805
+2023-11-13 16:03:56,379 - mmcls - INFO - Epoch [25][200/433]	lr: 9.637e-04, eta: 1 day, 8:46:44, time: 4.053, data_time: 3.361, memory: 21508, loss: 0.0020, grad_norm: 0.0447
+2023-11-13 16:08:07,419 - mmcls - INFO - Epoch [25][250/433]	lr: 9.634e-04, eta: 1 day, 9:06:04, time: 5.021, data_time: 4.327, memory: 21508, loss: 0.0027, grad_norm: 0.0465
+2023-11-13 16:12:28,001 - mmcls - INFO - Epoch [25][300/433]	lr: 9.631e-04, eta: 1 day, 9:26:19, time: 5.212, data_time: 4.518, memory: 21508, loss: 0.0022, grad_norm: 0.0707
+2023-11-13 16:18:29,252 - mmcls - INFO - Epoch [25][350/433]	lr: 9.627e-04, eta: 1 day, 9:58:11, time: 7.225, data_time: 6.530, memory: 21508, loss: 0.0091, grad_norm: 0.1526
+2023-11-13 16:22:27,040 - mmcls - INFO - Epoch [25][400/433]	lr: 9.624e-04, eta: 1 day, 10:15:14, time: 4.756, data_time: 4.066, memory: 21508, loss: 0.0072, grad_norm: 0.1308
+2023-11-13 16:26:06,247 - mmcls - INFO - Epoch [26][50/433]	lr: 9.618e-04, eta: 1 day, 10:07:42, time: 1.790, data_time: 1.105, memory: 21508, loss: 0.0042, grad_norm: 0.0932
+2023-11-13 16:27:26,797 - mmcls - INFO - Epoch [26][100/433]	lr: 9.614e-04, eta: 1 day, 10:06:17, time: 1.611, data_time: 0.925, memory: 21508, loss: 0.0140, grad_norm: 0.1993
+2023-11-13 16:28:54,261 - mmcls - INFO - Epoch [26][150/433]	lr: 9.611e-04, eta: 1 day, 10:05:40, time: 1.749, data_time: 1.063, memory: 21508, loss: 0.0079, grad_norm: 0.1090
+2023-11-13 16:30:15,380 - mmcls - INFO - Epoch [26][200/433]	lr: 9.607e-04, eta: 1 day, 10:04:18, time: 1.622, data_time: 0.937, memory: 21508, loss: 0.0045, grad_norm: 0.0836
+2023-11-13 16:31:40,692 - mmcls - INFO - Epoch [26][250/433]	lr: 9.604e-04, eta: 1 day, 10:03:26, time: 1.706, data_time: 1.015, memory: 21508, loss: 0.0048, grad_norm: 0.1057
+2023-11-13 16:32:58,260 - mmcls - INFO - Epoch [26][300/433]	lr: 9.600e-04, eta: 1 day, 10:01:40, time: 1.551, data_time: 0.859, memory: 21508, loss: 0.0050, grad_norm: 0.0687
+2023-11-13 16:34:23,095 - mmcls - INFO - Epoch [26][350/433]	lr: 9.597e-04, eta: 1 day, 10:00:44, time: 1.697, data_time: 1.005, memory: 21508, loss: 0.0032, grad_norm: 0.0553
+2023-11-13 16:35:42,801 - mmcls - INFO - Epoch [26][400/433]	lr: 9.593e-04, eta: 1 day, 9:59:13, time: 1.594, data_time: 0.902, memory: 21508, loss: 0.0029, grad_norm: 0.0826
+2023-11-13 16:38:05,774 - mmcls - INFO - Epoch [27][50/433]	lr: 9.587e-04, eta: 1 day, 9:51:37, time: 1.731, data_time: 1.040, memory: 21508, loss: 0.0032, grad_norm: 0.0551
+2023-11-13 16:39:24,757 - mmcls - INFO - Epoch [27][100/433]	lr: 9.584e-04, eta: 1 day, 9:50:03, time: 1.580, data_time: 0.886, memory: 21508, loss: 0.0026, grad_norm: 0.0435
+2023-11-13 16:40:48,092 - mmcls - INFO - Epoch [27][150/433]	lr: 9.580e-04, eta: 1 day, 9:48:58, time: 1.667, data_time: 0.974, memory: 21508, loss: 0.0030, grad_norm: 0.0579
+2023-11-13 16:42:07,604 - mmcls - INFO - Epoch [27][200/433]	lr: 9.576e-04, eta: 1 day, 9:47:28, time: 1.590, data_time: 0.897, memory: 21508, loss: 0.0020, grad_norm: 0.0400
+2023-11-13 16:43:31,613 - mmcls - INFO - Epoch [27][250/433]	lr: 9.573e-04, eta: 1 day, 9:46:27, time: 1.680, data_time: 0.986, memory: 21508, loss: 0.0040, grad_norm: 0.0646
+2023-11-13 16:44:48,483 - mmcls - INFO - Epoch [27][300/433]	lr: 9.569e-04, eta: 1 day, 9:44:39, time: 1.537, data_time: 0.846, memory: 21508, loss: 0.0026, grad_norm: 0.0598
+2023-11-13 16:46:14,692 - mmcls - INFO - Epoch [27][350/433]	lr: 9.565e-04, eta: 1 day, 9:43:52, time: 1.724, data_time: 1.037, memory: 21508, loss: 0.0044, grad_norm: 0.0861
+2023-11-13 16:47:32,501 - mmcls - INFO - Epoch [27][400/433]	lr: 9.562e-04, eta: 1 day, 9:42:11, time: 1.556, data_time: 0.871, memory: 21508, loss: 0.0018, grad_norm: 0.0392
+2023-11-13 16:49:54,229 - mmcls - INFO - Epoch [28][50/433]	lr: 9.556e-04, eta: 1 day, 9:35:07, time: 1.779, data_time: 1.090, memory: 21508, loss: 0.0036, grad_norm: 0.0662
+2023-11-13 16:51:13,984 - mmcls - INFO - Epoch [28][100/433]	lr: 9.552e-04, eta: 1 day, 9:33:40, time: 1.595, data_time: 0.904, memory: 21508, loss: 0.0032, grad_norm: 0.0539
+2023-11-13 16:52:34,626 - mmcls - INFO - Epoch [28][150/433]	lr: 9.548e-04, eta: 1 day, 9:32:18, time: 1.613, data_time: 0.921, memory: 21508, loss: 0.0023, grad_norm: 0.0361
+2023-11-13 16:53:58,019 - mmcls - INFO - Epoch [28][200/433]	lr: 9.544e-04, eta: 1 day, 9:31:14, time: 1.668, data_time: 0.976, memory: 21508, loss: 0.0020, grad_norm: 0.0373
+2023-11-13 16:55:15,654 - mmcls - INFO - Epoch [28][250/433]	lr: 9.541e-04, eta: 1 day, 9:29:34, time: 1.553, data_time: 0.860, memory: 21508, loss: 0.0020, grad_norm: 0.0449
+2023-11-13 16:56:36,908 - mmcls - INFO - Epoch [28][300/433]	lr: 9.537e-04, eta: 1 day, 9:28:16, time: 1.625, data_time: 0.930, memory: 21508, loss: 0.0021, grad_norm: 0.0311
+2023-11-13 16:57:54,455 - mmcls - INFO - Epoch [28][350/433]	lr: 9.533e-04, eta: 1 day, 9:26:35, time: 1.551, data_time: 0.859, memory: 21508, loss: 0.0017, grad_norm: 0.0410
+2023-11-13 16:59:15,795 - mmcls - INFO - Epoch [28][400/433]	lr: 9.529e-04, eta: 1 day, 9:25:18, time: 1.627, data_time: 0.935, memory: 21508, loss: 0.0015, grad_norm: 0.0223
+2023-11-13 17:01:33,505 - mmcls - INFO - Epoch [29][50/433]	lr: 9.523e-04, eta: 1 day, 9:18:11, time: 1.722, data_time: 1.029, memory: 21508, loss: 0.0014, grad_norm: 0.0283
+2023-11-13 17:02:51,280 - mmcls - INFO - Epoch [29][100/433]	lr: 9.519e-04, eta: 1 day, 9:16:34, time: 1.555, data_time: 0.863, memory: 21508, loss: 0.0017, grad_norm: 0.0391
+2023-11-13 17:04:14,079 - mmcls - INFO - Epoch [29][150/433]	lr: 9.515e-04, eta: 1 day, 9:15:27, time: 1.656, data_time: 0.963, memory: 21508, loss: 0.0027, grad_norm: 0.0504
+2023-11-13 17:05:32,107 - mmcls - INFO - Epoch [29][200/433]	lr: 9.511e-04, eta: 1 day, 9:13:51, time: 1.561, data_time: 0.869, memory: 21508, loss: 0.0014, grad_norm: 0.0394
+2023-11-13 17:06:53,910 - mmcls - INFO - Epoch [29][250/433]	lr: 9.507e-04, eta: 1 day, 9:12:39, time: 1.636, data_time: 0.943, memory: 21508, loss: 0.0022, grad_norm: 0.0506
+2023-11-13 17:08:10,440 - mmcls - INFO - Epoch [29][300/433]	lr: 9.503e-04, eta: 1 day, 9:10:54, time: 1.531, data_time: 0.838, memory: 21508, loss: 0.0023, grad_norm: 0.0444
+2023-11-13 17:09:32,185 - mmcls - INFO - Epoch [29][350/433]	lr: 9.499e-04, eta: 1 day, 9:09:41, time: 1.635, data_time: 0.943, memory: 21508, loss: 0.0030, grad_norm: 0.0558
+2023-11-13 17:10:47,074 - mmcls - INFO - Epoch [29][400/433]	lr: 9.495e-04, eta: 1 day, 9:07:47, time: 1.498, data_time: 0.806, memory: 21508, loss: 0.0051, grad_norm: 0.0852
+2023-11-13 17:13:06,841 - mmcls - INFO - Epoch [30][50/433]	lr: 9.489e-04, eta: 1 day, 9:00:59, time: 1.737, data_time: 1.048, memory: 21508, loss: 0.0022, grad_norm: 0.0457
+2023-11-13 17:14:26,530 - mmcls - INFO - Epoch [30][100/433]	lr: 9.485e-04, eta: 1 day, 8:59:35, time: 1.594, data_time: 0.909, memory: 21508, loss: 0.0021, grad_norm: 0.0410
+2023-11-13 17:15:51,180 - mmcls - INFO - Epoch [30][150/433]	lr: 9.481e-04, eta: 1 day, 8:58:40, time: 1.693, data_time: 1.008, memory: 21508, loss: 0.0029, grad_norm: 0.0942
+2023-11-13 17:17:11,278 - mmcls - INFO - Epoch [30][200/433]	lr: 9.477e-04, eta: 1 day, 8:57:18, time: 1.602, data_time: 0.917, memory: 21508, loss: 0.0073, grad_norm: 0.0993
+2023-11-13 17:18:35,176 - mmcls - INFO - Epoch [30][250/433]	lr: 9.473e-04, eta: 1 day, 8:56:18, time: 1.678, data_time: 0.991, memory: 21508, loss: 0.0047, grad_norm: 0.0785
+2023-11-13 17:19:50,751 - mmcls - INFO - Epoch [30][300/433]	lr: 9.469e-04, eta: 1 day, 8:54:30, time: 1.512, data_time: 0.819, memory: 21508, loss: 0.0038, grad_norm: 0.0579
+2023-11-13 17:21:11,207 - mmcls - INFO - Epoch [30][350/433]	lr: 9.465e-04, eta: 1 day, 8:53:11, time: 1.609, data_time: 0.916, memory: 21508, loss: 0.0031, grad_norm: 0.0601
+2023-11-13 17:22:30,183 - mmcls - INFO - Epoch [30][400/433]	lr: 9.461e-04, eta: 1 day, 8:51:43, time: 1.580, data_time: 0.887, memory: 21508, loss: 0.0041, grad_norm: 0.0744
+2023-11-13 17:23:23,436 - mmcls - INFO - Saving checkpoint at 30 epochs
+2023-11-13 17:29:31,307 - mmcls - INFO - Epoch(val) [30][34]	accuracy_top-1: 99.7179, accuracy_top-2: 100.0000
+2023-11-13 17:31:00,277 - mmcls - INFO - Epoch [31][50/433]	lr: 9.454e-04, eta: 1 day, 8:45:19, time: 1.779, data_time: 1.095, memory: 21508, loss: 0.0026, grad_norm: 0.0390
+2023-11-13 17:32:21,250 - mmcls - INFO - Epoch [31][100/433]	lr: 9.450e-04, eta: 1 day, 8:44:04, time: 1.619, data_time: 0.934, memory: 21508, loss: 0.0065, grad_norm: 0.1066
+2023-11-13 17:33:47,488 - mmcls - INFO - Epoch [31][150/433]	lr: 9.445e-04, eta: 1 day, 8:43:18, time: 1.725, data_time: 1.038, memory: 21508, loss: 0.0035, grad_norm: 0.0532
+2023-11-13 17:35:08,757 - mmcls - INFO - Epoch [31][200/433]	lr: 9.441e-04, eta: 1 day, 8:42:03, time: 1.625, data_time: 0.939, memory: 21508, loss: 0.0036, grad_norm: 0.0602
+2023-11-13 17:36:31,124 - mmcls - INFO - Epoch [31][250/433]	lr: 9.437e-04, eta: 1 day, 8:40:55, time: 1.647, data_time: 0.961, memory: 21508, loss: 0.0023, grad_norm: 0.0471
+2023-11-13 17:37:52,617 - mmcls - INFO - Epoch [31][300/433]	lr: 9.433e-04, eta: 1 day, 8:39:42, time: 1.630, data_time: 0.939, memory: 21508, loss: 0.0033, grad_norm: 0.0579
+2023-11-13 17:39:10,360 - mmcls - INFO - Epoch [31][350/433]	lr: 9.429e-04, eta: 1 day, 8:38:09, time: 1.555, data_time: 0.861, memory: 21508, loss: 0.0032, grad_norm: 0.0454
+2023-11-13 17:40:29,382 - mmcls - INFO - Epoch [31][400/433]	lr: 9.425e-04, eta: 1 day, 8:36:42, time: 1.580, data_time: 0.890, memory: 21508, loss: 0.0020, grad_norm: 0.0513
+2023-11-13 17:42:51,154 - mmcls - INFO - Epoch [32][50/433]	lr: 9.418e-04, eta: 1 day, 8:30:22, time: 1.751, data_time: 1.059, memory: 21508, loss: 0.0030, grad_norm: 0.0631
+2023-11-13 17:44:07,598 - mmcls - INFO - Epoch [32][100/433]	lr: 9.413e-04, eta: 1 day, 8:28:43, time: 1.529, data_time: 0.837, memory: 21508, loss: 0.0034, grad_norm: 0.0643
+2023-11-13 17:45:30,298 - mmcls - INFO - Epoch [32][150/433]	lr: 9.409e-04, eta: 1 day, 8:27:37, time: 1.654, data_time: 0.963, memory: 21508, loss: 0.0020, grad_norm: 0.0338
+2023-11-13 17:46:48,370 - mmcls - INFO - Epoch [32][200/433]	lr: 9.405e-04, eta: 1 day, 8:26:07, time: 1.561, data_time: 0.867, memory: 21508, loss: 0.0022, grad_norm: 0.0425
+2023-11-13 17:48:10,556 - mmcls - INFO - Epoch [32][250/433]	lr: 9.401e-04, eta: 1 day, 8:24:58, time: 1.644, data_time: 0.951, memory: 21508, loss: 0.0018, grad_norm: 0.0517
+2023-11-13 17:49:27,806 - mmcls - INFO - Epoch [32][300/433]	lr: 9.396e-04, eta: 1 day, 8:23:24, time: 1.545, data_time: 0.851, memory: 21508, loss: 0.0024, grad_norm: 0.0478
+2023-11-13 17:50:52,081 - mmcls - INFO - Epoch [32][350/433]	lr: 9.392e-04, eta: 1 day, 8:22:26, time: 1.685, data_time: 0.994, memory: 21508, loss: 0.0033, grad_norm: 0.0691
+2023-11-13 17:52:10,097 - mmcls - INFO - Epoch [32][400/433]	lr: 9.388e-04, eta: 1 day, 8:20:56, time: 1.560, data_time: 0.868, memory: 21508, loss: 0.0029, grad_norm: 0.0574
+2023-11-13 17:54:30,746 - mmcls - INFO - Epoch [33][50/433]	lr: 9.380e-04, eta: 1 day, 8:14:37, time: 1.715, data_time: 1.024, memory: 21508, loss: 0.0022, grad_norm: 0.0459
+2023-11-13 17:55:50,818 - mmcls - INFO - Epoch [33][100/433]	lr: 9.376e-04, eta: 1 day, 8:13:18, time: 1.601, data_time: 0.910, memory: 21508, loss: 0.0020, grad_norm: 0.0480
+2023-11-13 17:57:11,472 - mmcls - INFO - Epoch [33][150/433]	lr: 9.372e-04, eta: 1 day, 8:12:03, time: 1.613, data_time: 0.921, memory: 21508, loss: 0.0044, grad_norm: 0.1004
+2023-11-13 17:58:31,171 - mmcls - INFO - Epoch [33][200/433]	lr: 9.367e-04, eta: 1 day, 8:10:42, time: 1.594, data_time: 0.902, memory: 21508, loss: 0.0053, grad_norm: 0.0784
+2023-11-13 17:59:51,199 - mmcls - INFO - Epoch [33][250/433]	lr: 9.363e-04, eta: 1 day, 8:09:23, time: 1.601, data_time: 0.907, memory: 21508, loss: 0.0040, grad_norm: 0.0576
+2023-11-13 18:01:12,145 - mmcls - INFO - Epoch [33][300/433]	lr: 9.358e-04, eta: 1 day, 8:08:09, time: 1.619, data_time: 0.927, memory: 21508, loss: 0.0027, grad_norm: 0.0582
+2023-11-13 18:02:29,748 - mmcls - INFO - Epoch [33][350/433]	lr: 9.354e-04, eta: 1 day, 8:06:38, time: 1.552, data_time: 0.860, memory: 21508, loss: 0.0050, grad_norm: 0.0737
+2023-11-13 18:03:50,876 - mmcls - INFO - Epoch [33][400/433]	lr: 9.349e-04, eta: 1 day, 8:05:24, time: 1.623, data_time: 0.930, memory: 21508, loss: 0.0027, grad_norm: 0.0467
+2023-11-13 18:06:04,398 - mmcls - INFO - Epoch [34][50/433]	lr: 9.342e-04, eta: 1 day, 7:59:07, time: 1.681, data_time: 0.991, memory: 21508, loss: 0.0015, grad_norm: 0.0369
+2023-11-13 18:07:22,892 - mmcls - INFO - Epoch [34][100/433]	lr: 9.338e-04, eta: 1 day, 7:57:42, time: 1.570, data_time: 0.878, memory: 21508, loss: 0.0020, grad_norm: 0.0504
+2023-11-13 18:08:40,169 - mmcls - INFO - Epoch [34][150/433]	lr: 9.333e-04, eta: 1 day, 7:56:10, time: 1.546, data_time: 0.854, memory: 21508, loss: 0.0013, grad_norm: 0.0380
+2023-11-13 18:09:58,279 - mmcls - INFO - Epoch [34][200/433]	lr: 9.329e-04, eta: 1 day, 7:54:43, time: 1.562, data_time: 0.868, memory: 21508, loss: 0.0038, grad_norm: 0.0801
+2023-11-13 18:11:19,215 - mmcls - INFO - Epoch [34][250/433]	lr: 9.324e-04, eta: 1 day, 7:53:29, time: 1.619, data_time: 0.926, memory: 21508, loss: 0.0035, grad_norm: 0.0614
+2023-11-13 18:12:39,855 - mmcls - INFO - Epoch [34][300/433]	lr: 9.319e-04, eta: 1 day, 7:52:15, time: 1.613, data_time: 0.921, memory: 21508, loss: 0.0043, grad_norm: 0.0842
+2023-11-13 18:14:02,927 - mmcls - INFO - Epoch [34][350/433]	lr: 9.315e-04, eta: 1 day, 7:51:12, time: 1.661, data_time: 0.970, memory: 21508, loss: 0.0031, grad_norm: 0.0473
+2023-11-13 18:15:20,579 - mmcls - INFO - Epoch [34][400/433]	lr: 9.310e-04, eta: 1 day, 7:49:42, time: 1.553, data_time: 0.861, memory: 21508, loss: 0.0026, grad_norm: 0.0569
+2023-11-13 18:17:40,231 - mmcls - INFO - Epoch [35][50/433]	lr: 9.303e-04, eta: 1 day, 7:43:52, time: 1.750, data_time: 1.059, memory: 21508, loss: 0.0042, grad_norm: 0.0678
+2023-11-13 18:19:00,257 - mmcls - INFO - Epoch [35][100/433]	lr: 9.298e-04, eta: 1 day, 7:42:35, time: 1.601, data_time: 0.908, memory: 21508, loss: 0.0029, grad_norm: 0.0400
+2023-11-13 18:20:24,651 - mmcls - INFO - Epoch [35][150/433]	lr: 9.293e-04, eta: 1 day, 7:41:39, time: 1.688, data_time: 0.995, memory: 21508, loss: 0.0021, grad_norm: 0.0359
+2023-11-13 18:21:43,925 - mmcls - INFO - Epoch [35][200/433]	lr: 9.289e-04, eta: 1 day, 7:40:18, time: 1.585, data_time: 0.893, memory: 21508, loss: 0.0020, grad_norm: 0.0366
+2023-11-13 18:23:06,535 - mmcls - INFO - Epoch [35][250/433]	lr: 9.284e-04, eta: 1 day, 7:39:14, time: 1.652, data_time: 0.960, memory: 21508, loss: 0.0023, grad_norm: 0.0421
+2023-11-13 18:24:26,524 - mmcls - INFO - Epoch [35][300/433]	lr: 9.279e-04, eta: 1 day, 7:37:56, time: 1.600, data_time: 0.909, memory: 21508, loss: 0.0024, grad_norm: 0.0358
+2023-11-13 18:25:48,448 - mmcls - INFO - Epoch [35][350/433]	lr: 9.275e-04, eta: 1 day, 7:36:48, time: 1.638, data_time: 0.945, memory: 21508, loss: 0.0026, grad_norm: 0.0357
+2023-11-13 18:27:08,462 - mmcls - INFO - Epoch [35][400/433]	lr: 9.270e-04, eta: 1 day, 7:35:30, time: 1.600, data_time: 0.909, memory: 21508, loss: 0.0016, grad_norm: 0.0378
+2023-11-13 18:29:33,184 - mmcls - INFO - Epoch [36][50/433]	lr: 9.262e-04, eta: 1 day, 7:29:57, time: 1.784, data_time: 1.092, memory: 21508, loss: 0.0018, grad_norm: 0.0447
+2023-11-13 18:30:50,742 - mmcls - INFO - Epoch [36][100/433]	lr: 9.258e-04, eta: 1 day, 7:28:29, time: 1.551, data_time: 0.861, memory: 21508, loss: 0.0027, grad_norm: 0.0603
+2023-11-13 18:32:13,698 - mmcls - INFO - Epoch [36][150/433]	lr: 9.253e-04, eta: 1 day, 7:27:26, time: 1.659, data_time: 0.967, memory: 21508, loss: 0.0105, grad_norm: 0.2962
+2023-11-13 18:33:32,708 - mmcls - INFO - Epoch [36][200/433]	lr: 9.248e-04, eta: 1 day, 7:26:05, time: 1.580, data_time: 0.889, memory: 21508, loss: 0.0088, grad_norm: 0.1265
+2023-11-13 18:34:56,087 - mmcls - INFO - Epoch [36][250/433]	lr: 9.243e-04, eta: 1 day, 7:25:04, time: 1.668, data_time: 0.974, memory: 21508, loss: 0.0098, grad_norm: 0.1355
+2023-11-13 18:36:11,872 - mmcls - INFO - Epoch [36][300/433]	lr: 9.238e-04, eta: 1 day, 7:23:27, time: 1.516, data_time: 0.823, memory: 21508, loss: 0.0059, grad_norm: 0.0888

@@ -1,0 +1,1018 @@
+2023-11-10 09:24:31,483 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.17 | packaged by conda-forge | (default, Jun 16 2023, 07:06:00) [GCC 11.4.0]
+CUDA available: True
+GPU 0,1: NVIDIA GeForce RTX 3090
+CUDA_HOME: /usr/local/cuda-11.6
+NVCC: Build cuda_11.6.r11.6/compiler.31057947_0
+GCC: gcc (GCC) 7.3.0
+PyTorch: 1.8.0+cu111
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.1
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.0.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.1, CUDNN_VERSION=8.0.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.0+cu111
+OpenCV: 4.8.0
+MMCV: 1.4.2
+MMCV Compiler: n/a
+MMCV CUDA Compiler: n/a
+MMClassification: 0.24.0+
+------------------------------------------------------------
+
+2023-11-10 09:24:31,484 - mmcls - INFO - Distributed training: True
+2023-11-10 09:24:32,442 - mmcls - INFO - Config:
+train_data_root = '/data4/lj/Dataset/TongYi/Cls_Standard_11_10'
+test_data_root = '/data4/lj/Dataset/TongYi/cls_test'
+work_dir = 'work_dirs/swin_tiny/Tongyi/11_10'
+num_classes = 149
+batch_size = 180
+max_epochs = 200
+interval_save = 50
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(
+        type='SwinTransformer',
+        arch='tiny',
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint=
+            '/data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth',
+            prefix='backbone'),
+        img_size=224,
+        drop_path_rate=0.2),
+    neck=dict(type='GlobalAveragePooling'),
+    head=dict(
+        type='LinearClsHead',
+        num_classes=149,
+        in_channels=768,
+        init_cfg=None,
+        loss=dict(
+            type='LabelSmoothLoss',
+            label_smooth_val=0.1,
+            mode='original',
+            loss_weight=[
+                0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1
+            ]),
+        cal_acc=False),
+    init_cfg=[
+        dict(type='TruncNormal', layer='Linear', std=0.02, bias=0.0),
+        dict(type='Constant', layer='LayerNorm', val=1.0, bias=0.0)
+    ])
+dataset_type = 'CustomDataset'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Rotate', angle=8.0, interpolation='bicubic'),
+    dict(
+        type='Rotate',
+        angle=90.0,
+        interpolation='bicubic',
+        prob=0.1,
+        random_negative_prob=0.5),
+    dict(
+        type='Rotate',
+        angle=180.0,
+        interpolation='bicubic',
+        prob=0.1,
+        random_negative_prob=0.5),
+    dict(type='Jie_Pad', pad_size_h=224, pad_size_w=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Jie_Pad', pad_size_h=224, pad_size_w=224),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=180,
+    workers_per_gpu=4,
+    train=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/Dataset/TongYi/Cls_Standard_11_10',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Rotate', angle=8.0, interpolation='bicubic'),
+            dict(
+                type='Rotate',
+                angle=90.0,
+                interpolation='bicubic',
+                prob=0.1,
+                random_negative_prob=0.5),
+            dict(
+                type='Rotate',
+                angle=180.0,
+                interpolation='bicubic',
+                prob=0.1,
+                random_negative_prob=0.5),
+            dict(type='Jie_Pad', pad_size_h=224, pad_size_w=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/Dataset/TongYi/cls_test',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Jie_Pad', pad_size_h=224, pad_size_w=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='CustomDataset',
+        data_prefix='/data4/lj/Dataset/TongYi/cls_test',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Jie_Pad', pad_size_h=224, pad_size_w=224),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(interval=10, metric='accuracy')
+paramwise_cfg = dict(
+    norm_decay_mult=0.0,
+    bias_decay_mult=0.0,
+    custom_keys=dict({
+        '.absolute_pos_embed': dict(decay_mult=0.0),
+        '.relative_position_bias_table': dict(decay_mult=0.0)
+    }))
+optimizer = dict(
+    type='AdamW',
+    lr=0.001,
+    weight_decay=0.05,
+    eps=1e-08,
+    betas=(0.9, 0.999),
+    paramwise_cfg=dict(
+        norm_decay_mult=0.0,
+        bias_decay_mult=0.0,
+        custom_keys=dict({
+            '.absolute_pos_embed': dict(decay_mult=0.0),
+            '.relative_position_bias_table': dict(decay_mult=0.0)
+        })))
+optimizer_config = dict(grad_clip=dict(max_norm=5.0))
+lr_config = dict(
+    policy='CosineAnnealing',
+    by_epoch=False,
+    min_lr_ratio=0.01,
+    warmup='linear',
+    warmup_ratio=0.001,
+    warmup_iters=20,
+    warmup_by_epoch=True)
+runner = dict(type='EpochBasedRunner', max_epochs=200)
+checkpoint_config = dict(interval=50, save_optimizer=True)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+gpu_ids = range(0, 2)
+
+2023-11-10 09:24:37,847 - mmcls - INFO - Set random seed to 2081829359, deterministic: False
+2023-11-10 09:24:38,128 - mmcls - INFO - initialize ImageClassifier with init_cfg [{'type': 'TruncNormal', 'layer': 'Linear', 'std': 0.02, 'bias': 0.0}, {'type': 'Constant', 'layer': 'LayerNorm', 'val': 1.0, 'bias': 0.0}]
+2023-11-10 09:24:38,441 - mmcls - INFO - initialize SwinTransformer with init_cfg {'type': 'Pretrained', 'checkpoint': '/data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth', 'prefix': 'backbone'}
+2023-11-10 09:24:38,803 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 3]) to torch.Size([169, 3])
+2023-11-10 09:24:38,804 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 3]) to torch.Size([169, 3])
+2023-11-10 09:24:38,805 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 6]) to torch.Size([169, 6])
+2023-11-10 09:24:38,807 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 6]) to torch.Size([169, 6])
+2023-11-10 09:24:38,809 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,811 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,814 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,816 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,819 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,821 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 12]) to torch.Size([169, 12])
+2023-11-10 09:24:38,826 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 24]) to torch.Size([169, 24])
+2023-11-10 09:24:38,831 - mmcls - INFO - Resize the relative_position_bias_table from torch.Size([49, 24]) to torch.Size([169, 24])
+Name of parameter - Initialization information
+
+backbone.patch_embed.projection.weight - torch.Size([96, 3, 4, 4]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.patch_embed.projection.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.patch_embed.norm.weight - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.patch_embed.norm.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.norm1.weight - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.norm1.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 3]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.qkv.weight - torch.Size([288, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.qkv.bias - torch.Size([288]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.proj.weight - torch.Size([96, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.attn.w_msa.proj.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.norm2.weight - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.norm2.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.0.0.weight - torch.Size([384, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.0.0.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.1.weight - torch.Size([96, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.0.ffn.layers.1.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.norm1.weight - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.norm1.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 3]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.qkv.weight - torch.Size([288, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.qkv.bias - torch.Size([288]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.proj.weight - torch.Size([96, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.attn.w_msa.proj.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.norm2.weight - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.norm2.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.0.0.weight - torch.Size([384, 96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.0.0.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.1.weight - torch.Size([96, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.blocks.1.ffn.layers.1.bias - torch.Size([96]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.downsample.norm.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.downsample.norm.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.0.downsample.reduction.weight - torch.Size([192, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.norm1.weight - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.norm1.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 6]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.qkv.weight - torch.Size([576, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.qkv.bias - torch.Size([576]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.proj.weight - torch.Size([192, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.attn.w_msa.proj.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.norm2.weight - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.norm2.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.0.0.weight - torch.Size([768, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.0.0.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.1.weight - torch.Size([192, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.0.ffn.layers.1.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.norm1.weight - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.norm1.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 6]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.qkv.weight - torch.Size([576, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.qkv.bias - torch.Size([576]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.proj.weight - torch.Size([192, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.attn.w_msa.proj.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.norm2.weight - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.norm2.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.0.0.weight - torch.Size([768, 192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.0.0.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.1.weight - torch.Size([192, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.blocks.1.ffn.layers.1.bias - torch.Size([192]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.downsample.norm.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.downsample.norm.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.1.downsample.reduction.weight - torch.Size([384, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.0.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.1.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.2.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.3.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.4.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.norm1.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.norm1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.relative_position_bias_table - torch.Size([169, 12]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.qkv.weight - torch.Size([1152, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.qkv.bias - torch.Size([1152]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.proj.weight - torch.Size([384, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.attn.w_msa.proj.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.norm2.weight - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.norm2.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.0.0.weight - torch.Size([1536, 384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.0.0.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.1.weight - torch.Size([384, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.blocks.5.ffn.layers.1.bias - torch.Size([384]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.downsample.norm.weight - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.downsample.norm.bias - torch.Size([1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.2.downsample.reduction.weight - torch.Size([768, 1536]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.norm1.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.norm1.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.relative_position_bias_table - torch.Size([169, 24]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.qkv.weight - torch.Size([2304, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.qkv.bias - torch.Size([2304]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.proj.weight - torch.Size([768, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.attn.w_msa.proj.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.norm2.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.norm2.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.0.0.weight - torch.Size([3072, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.0.0.bias - torch.Size([3072]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.1.weight - torch.Size([768, 3072]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.0.ffn.layers.1.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.norm1.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.norm1.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.relative_position_bias_table - torch.Size([169, 24]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.qkv.weight - torch.Size([2304, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.qkv.bias - torch.Size([2304]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.proj.weight - torch.Size([768, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.attn.w_msa.proj.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.norm2.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.norm2.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.0.0.weight - torch.Size([3072, 768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.0.0.bias - torch.Size([3072]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.1.weight - torch.Size([768, 3072]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.stages.3.blocks.1.ffn.layers.1.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.norm3.weight - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+backbone.norm3.bias - torch.Size([768]): 
+PretrainedInit: load from /data4/lj/Classification/1.7/work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth 
+
+head.fc.weight - torch.Size([149, 768]): 
+TruncNormalInit: a=-2, b=2, mean=0, std=0.02, bias=0.0 
+
+head.fc.bias - torch.Size([149]): 
+TruncNormalInit: a=-2, b=2, mean=0, std=0.02, bias=0.0 
+2023-11-10 09:24:52,545 - mmcls - INFO - Start running, host: root@8F-02-37u-AItest29, work_dir: /data4/lj/Classification/1.7/work_dirs/swin_tiny/Tongyi/11_10
+2023-11-10 09:24:52,545 - mmcls - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) DistOptimizerHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) DistEvalHook                       
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) DistSamplerSeedHook                
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2023-11-10 09:24:52,545 - mmcls - INFO - workflow: [('train', 1)], max: 200 epochs
+2023-11-10 09:24:52,546 - mmcls - INFO - Checkpoints will be saved to /data4/lj/Classification/1.7/work_dirs/swin_tiny/Tongyi/11_10 by HardDiskBackend.
+2023-11-10 09:25:56,420 - mmcls - INFO - Epoch [1][50/239]	lr: 1.124e-05, eta: 16:52:33, time: 1.272, data_time: 0.418, memory: 20514, loss: 4.9684
+2023-11-10 09:27:11,116 - mmcls - INFO - Epoch [1][100/239]	lr: 2.169e-05, eta: 18:21:22, time: 1.498, data_time: 0.815, memory: 20514, loss: 4.7291
+2023-11-10 09:28:52,656 - mmcls - INFO - Epoch [1][150/239]	lr: 3.214e-05, eta: 21:11:12, time: 2.031, data_time: 1.351, memory: 20514, loss: 4.1782
+2023-11-10 09:30:44,575 - mmcls - INFO - Epoch [1][200/239]	lr: 4.259e-05, eta: 23:16:21, time: 2.238, data_time: 1.554, memory: 20514, loss: 3.0085
+2023-11-10 09:32:51,139 - mmcls - INFO - Epoch [2][50/239]	lr: 6.119e-05, eta: 17:49:57, time: 0.770, data_time: 0.071, memory: 20514, loss: 1.5953
+2023-11-10 09:33:26,637 - mmcls - INFO - Epoch [2][100/239]	lr: 7.163e-05, eta: 16:34:00, time: 0.710, data_time: 0.001, memory: 20514, loss: 1.3741
+2023-11-10 09:34:02,324 - mmcls - INFO - Epoch [2][150/239]	lr: 8.208e-05, eta: 15:37:49, time: 0.714, data_time: 0.001, memory: 20514, loss: 1.2481
+2023-11-10 09:34:38,227 - mmcls - INFO - Epoch [2][200/239]	lr: 9.252e-05, eta: 14:54:40, time: 0.718, data_time: 0.001, memory: 20514, loss: 1.1828
+2023-11-10 09:35:44,891 - mmcls - INFO - Epoch [3][50/239]	lr: 1.111e-04, eta: 13:20:27, time: 0.777, data_time: 0.066, memory: 20514, loss: 1.0945
+2023-11-10 09:36:20,649 - mmcls - INFO - Epoch [3][100/239]	lr: 1.215e-04, eta: 12:59:07, time: 0.715, data_time: 0.001, memory: 20514, loss: 1.0725
+2023-11-10 09:36:56,379 - mmcls - INFO - Epoch [3][150/239]	lr: 1.320e-04, eta: 12:41:03, time: 0.715, data_time: 0.001, memory: 20514, loss: 1.0558
+2023-11-10 09:37:32,149 - mmcls - INFO - Epoch [3][200/239]	lr: 1.424e-04, eta: 12:25:37, time: 0.715, data_time: 0.001, memory: 20514, loss: 1.0387
+2023-11-10 09:38:38,894 - mmcls - INFO - Epoch [4][50/239]	lr: 1.610e-04, eta: 11:37:37, time: 0.778, data_time: 0.068, memory: 20514, loss: 1.0081
+2023-11-10 09:39:14,653 - mmcls - INFO - Epoch [4][100/239]	lr: 1.714e-04, eta: 11:28:30, time: 0.715, data_time: 0.001, memory: 20514, loss: 1.0047
+2023-11-10 09:39:50,336 - mmcls - INFO - Epoch [4][150/239]	lr: 1.818e-04, eta: 11:20:18, time: 0.714, data_time: 0.001, memory: 20514, loss: 0.9874
+2023-11-10 09:40:25,776 - mmcls - INFO - Epoch [4][200/239]	lr: 1.923e-04, eta: 11:12:43, time: 0.709, data_time: 0.001, memory: 20514, loss: 0.9893
+2023-11-10 09:41:32,232 - mmcls - INFO - Epoch [5][50/239]	lr: 2.108e-04, eta: 10:42:08, time: 0.777, data_time: 0.066, memory: 20514, loss: 0.9652
+2023-11-10 09:42:07,843 - mmcls - INFO - Epoch [5][100/239]	lr: 2.212e-04, eta: 10:37:21, time: 0.712, data_time: 0.001, memory: 20514, loss: 0.9683
+2023-11-10 09:42:43,452 - mmcls - INFO - Epoch [5][150/239]	lr: 2.316e-04, eta: 10:32:56, time: 0.712, data_time: 0.001, memory: 20514, loss: 0.9539
+2023-11-10 09:43:19,194 - mmcls - INFO - Epoch [5][200/239]	lr: 2.420e-04, eta: 10:28:57, time: 0.715, data_time: 0.001, memory: 20514, loss: 0.9570
+2023-11-10 09:44:25,930 - mmcls - INFO - Epoch [6][50/239]	lr: 2.606e-04, eta: 10:07:09, time: 0.779, data_time: 0.068, memory: 20514, loss: 0.9400
+2023-11-10 09:45:01,824 - mmcls - INFO - Epoch [6][100/239]	lr: 2.710e-04, eta: 10:04:34, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9469
+2023-11-10 09:45:37,636 - mmcls - INFO - Epoch [6][150/239]	lr: 2.813e-04, eta: 10:02:05, time: 0.716, data_time: 0.001, memory: 20514, loss: 0.9407
+2023-11-10 09:46:13,376 - mmcls - INFO - Epoch [6][200/239]	lr: 2.917e-04, eta: 9:59:42, time: 0.715, data_time: 0.001, memory: 20514, loss: 0.9379
+2023-11-10 09:47:20,138 - mmcls - INFO - Epoch [7][50/239]	lr: 3.102e-04, eta: 9:42:54, time: 0.779, data_time: 0.066, memory: 20514, loss: 0.9283
+2023-11-10 09:47:55,906 - mmcls - INFO - Epoch [7][100/239]	lr: 3.206e-04, eta: 9:41:16, time: 0.715, data_time: 0.001, memory: 20514, loss: 0.9287
+2023-11-10 09:48:31,701 - mmcls - INFO - Epoch [7][150/239]	lr: 3.310e-04, eta: 9:39:43, time: 0.716, data_time: 0.001, memory: 20514, loss: 0.9276
+2023-11-10 09:49:07,362 - mmcls - INFO - Epoch [7][200/239]	lr: 3.413e-04, eta: 9:38:10, time: 0.713, data_time: 0.001, memory: 20514, loss: 0.9283
+2023-11-10 09:50:14,086 - mmcls - INFO - Epoch [8][50/239]	lr: 3.597e-04, eta: 9:24:34, time: 0.778, data_time: 0.065, memory: 20514, loss: 0.9172
+2023-11-10 09:50:49,939 - mmcls - INFO - Epoch [8][100/239]	lr: 3.701e-04, eta: 9:23:34, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9149
+2023-11-10 09:51:25,801 - mmcls - INFO - Epoch [8][150/239]	lr: 3.804e-04, eta: 9:22:35, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9229
+2023-11-10 09:52:01,716 - mmcls - INFO - Epoch [8][200/239]	lr: 3.908e-04, eta: 9:21:39, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9172
+2023-11-10 09:53:08,707 - mmcls - INFO - Epoch [9][50/239]	lr: 4.092e-04, eta: 9:10:20, time: 0.781, data_time: 0.067, memory: 20514, loss: 0.9118
+2023-11-10 09:53:44,569 - mmcls - INFO - Epoch [9][100/239]	lr: 4.195e-04, eta: 9:09:41, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9171
+2023-11-10 09:54:20,539 - mmcls - INFO - Epoch [9][150/239]	lr: 4.298e-04, eta: 9:09:03, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9159
+2023-11-10 09:54:56,537 - mmcls - INFO - Epoch [9][200/239]	lr: 4.401e-04, eta: 9:08:27, time: 0.720, data_time: 0.002, memory: 20514, loss: 0.9187
+2023-11-10 09:58:43,855 - mmcls - INFO - Epoch [10][50/239]	lr: 4.584e-04, eta: 9:25:30, time: 2.331, data_time: 0.438, memory: 20514, loss: 0.9064
+2023-11-10 10:00:28,072 - mmcls - INFO - Epoch [10][100/239]	lr: 4.687e-04, eta: 9:47:29, time: 2.084, data_time: 0.292, memory: 20514, loss: 0.9079
+2023-11-10 10:02:10,235 - mmcls - INFO - Epoch [10][150/239]	lr: 4.790e-04, eta: 10:07:45, time: 2.043, data_time: 1.004, memory: 20514, loss: 0.9172
+2023-11-10 10:03:54,396 - mmcls - INFO - Epoch [10][200/239]	lr: 4.892e-04, eta: 10:27:44, time: 2.083, data_time: 0.784, memory: 20514, loss: 0.9181
+2023-11-10 10:07:36,364 - mmcls - INFO - Epoch(val) [10][394]	accuracy_top-1: 92.8477, accuracy_top-2: 96.2729
+2023-11-10 10:09:37,417 - mmcls - INFO - Epoch [11][50/239]	lr: 5.075e-04, eta: 10:41:09, time: 2.421, data_time: 1.518, memory: 20514, loss: 0.9032
+2023-11-10 10:12:29,170 - mmcls - INFO - Epoch [11][100/239]	lr: 5.177e-04, eta: 11:19:41, time: 3.435, data_time: 2.750, memory: 20514, loss: 0.9135
+2023-11-10 10:16:37,348 - mmcls - INFO - Epoch [11][150/239]	lr: 5.280e-04, eta: 12:19:16, time: 4.963, data_time: 4.284, memory: 20514, loss: 0.9116
+2023-11-10 10:20:28,875 - mmcls - INFO - Epoch [11][200/239]	lr: 5.382e-04, eta: 13:11:33, time: 4.631, data_time: 3.951, memory: 20514, loss: 0.9142
+2023-11-10 10:25:34,246 - mmcls - INFO - Epoch [12][50/239]	lr: 5.564e-04, eta: 13:19:55, time: 2.577, data_time: 1.770, memory: 20514, loss: 0.9080
+2023-11-10 10:27:51,690 - mmcls - INFO - Epoch [12][100/239]	lr: 5.666e-04, eta: 13:42:13, time: 2.749, data_time: 1.753, memory: 20514, loss: 0.9112
+2023-11-10 10:31:47,905 - mmcls - INFO - Epoch [12][150/239]	lr: 5.768e-04, eta: 14:30:19, time: 4.724, data_time: 2.663, memory: 20514, loss: 0.9125
+2023-11-10 10:35:36,135 - mmcls - INFO - Epoch [12][200/239]	lr: 5.870e-04, eta: 15:14:27, time: 4.565, data_time: 1.515, memory: 20514, loss: 0.9135
+2023-11-10 10:39:54,406 - mmcls - INFO - Epoch [13][50/239]	lr: 6.051e-04, eta: 15:05:51, time: 1.642, data_time: 0.570, memory: 20514, loss: 0.9083
+2023-11-10 10:41:07,321 - mmcls - INFO - Epoch [13][100/239]	lr: 6.153e-04, eta: 15:07:58, time: 1.458, data_time: 0.323, memory: 20514, loss: 0.9107
+2023-11-10 10:42:26,430 - mmcls - INFO - Epoch [13][150/239]	lr: 6.254e-04, eta: 15:11:29, time: 1.582, data_time: 0.057, memory: 20514, loss: 0.9136
+2023-11-10 10:43:49,370 - mmcls - INFO - Epoch [13][200/239]	lr: 6.356e-04, eta: 15:15:47, time: 1.659, data_time: 0.744, memory: 20514, loss: 0.9151
+2023-11-10 10:45:35,814 - mmcls - INFO - Epoch [14][50/239]	lr: 6.536e-04, eta: 14:57:15, time: 0.769, data_time: 0.065, memory: 20514, loss: 0.9081
+2023-11-10 10:46:11,396 - mmcls - INFO - Epoch [14][100/239]	lr: 6.637e-04, eta: 14:50:31, time: 0.712, data_time: 0.001, memory: 20514, loss: 0.9036
+2023-11-10 10:46:47,311 - mmcls - INFO - Epoch [14][150/239]	lr: 6.738e-04, eta: 14:44:03, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9123
+2023-11-10 10:47:23,233 - mmcls - INFO - Epoch [14][200/239]	lr: 6.839e-04, eta: 14:37:46, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9188
+2023-11-10 10:48:30,160 - mmcls - INFO - Epoch [15][50/239]	lr: 7.018e-04, eta: 14:21:33, time: 0.780, data_time: 0.065, memory: 20514, loss: 0.9102
+2023-11-10 10:49:06,064 - mmcls - INFO - Epoch [15][100/239]	lr: 7.119e-04, eta: 14:15:48, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9106
+2023-11-10 10:49:42,009 - mmcls - INFO - Epoch [15][150/239]	lr: 7.219e-04, eta: 14:10:12, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9148
+2023-11-10 10:50:17,971 - mmcls - INFO - Epoch [15][200/239]	lr: 7.320e-04, eta: 14:04:45, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9180
+2023-11-10 10:51:24,848 - mmcls - INFO - Epoch [16][50/239]	lr: 7.498e-04, eta: 13:50:18, time: 0.780, data_time: 0.067, memory: 20514, loss: 0.9120
+2023-11-10 10:52:00,775 - mmcls - INFO - Epoch [16][100/239]	lr: 7.598e-04, eta: 13:45:16, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9177
+2023-11-10 10:52:36,697 - mmcls - INFO - Epoch [16][150/239]	lr: 7.698e-04, eta: 13:40:22, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9257
+2023-11-10 10:53:12,552 - mmcls - INFO - Epoch [16][200/239]	lr: 7.798e-04, eta: 13:35:33, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9139
+2023-11-10 10:54:19,396 - mmcls - INFO - Epoch [17][50/239]	lr: 7.975e-04, eta: 13:22:34, time: 0.780, data_time: 0.065, memory: 20514, loss: 0.9165
+2023-11-10 10:54:55,316 - mmcls - INFO - Epoch [17][100/239]	lr: 8.075e-04, eta: 13:18:08, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9193
+2023-11-10 10:55:31,242 - mmcls - INFO - Epoch [17][150/239]	lr: 8.174e-04, eta: 13:13:48, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9205
+2023-11-10 10:56:07,167 - mmcls - INFO - Epoch [17][200/239]	lr: 8.273e-04, eta: 13:09:33, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9211
+2023-11-10 10:57:14,152 - mmcls - INFO - Epoch [18][50/239]	lr: 8.449e-04, eta: 12:57:50, time: 0.784, data_time: 0.066, memory: 20514, loss: 0.9109
+2023-11-10 10:57:50,171 - mmcls - INFO - Epoch [18][100/239]	lr: 8.548e-04, eta: 12:53:55, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9165
+2023-11-10 10:58:26,098 - mmcls - INFO - Epoch [18][150/239]	lr: 8.647e-04, eta: 12:50:03, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9183
+2023-11-10 10:59:02,079 - mmcls - INFO - Epoch [18][200/239]	lr: 8.745e-04, eta: 12:46:16, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9210
+2023-11-10 11:00:09,131 - mmcls - INFO - Epoch [19][50/239]	lr: 8.920e-04, eta: 12:35:34, time: 0.783, data_time: 0.068, memory: 20514, loss: 0.9168
+2023-11-10 11:00:45,218 - mmcls - INFO - Epoch [19][100/239]	lr: 9.019e-04, eta: 12:32:03, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.9206
+2023-11-10 11:01:21,235 - mmcls - INFO - Epoch [19][150/239]	lr: 9.117e-04, eta: 12:28:36, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9198
+2023-11-10 11:01:57,206 - mmcls - INFO - Epoch [19][200/239]	lr: 9.214e-04, eta: 12:25:12, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9215
+2023-11-10 11:03:04,069 - mmcls - INFO - Epoch [20][50/239]	lr: 9.388e-04, eta: 12:15:22, time: 0.780, data_time: 0.067, memory: 20514, loss: 0.9168
+2023-11-10 11:03:40,039 - mmcls - INFO - Epoch [20][100/239]	lr: 9.486e-04, eta: 12:12:11, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9211
+2023-11-10 11:04:15,930 - mmcls - INFO - Epoch [20][150/239]	lr: 9.583e-04, eta: 12:09:02, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9292
+2023-11-10 11:04:51,856 - mmcls - INFO - Epoch [20][200/239]	lr: 9.680e-04, eta: 12:05:57, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9281
+2023-11-10 11:06:53,824 - mmcls - INFO - Epoch(val) [20][394]	accuracy_top-1: 91.7532, accuracy_top-2: 95.8040
+2023-11-10 11:07:32,823 - mmcls - INFO - Epoch [21][50/239]	lr: 9.753e-04, eta: 11:56:53, time: 0.780, data_time: 0.065, memory: 20514, loss: 0.9220
+2023-11-10 11:08:08,837 - mmcls - INFO - Epoch [21][100/239]	lr: 9.748e-04, eta: 11:53:59, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9225
+2023-11-10 11:08:44,852 - mmcls - INFO - Epoch [21][150/239]	lr: 9.743e-04, eta: 11:51:08, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9225
+2023-11-10 11:09:20,892 - mmcls - INFO - Epoch [21][200/239]	lr: 9.737e-04, eta: 11:48:21, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.9236
+2023-11-10 11:10:28,200 - mmcls - INFO - Epoch [22][50/239]	lr: 9.728e-04, eta: 11:39:59, time: 0.787, data_time: 0.068, memory: 20514, loss: 0.9181
+2023-11-10 11:11:04,190 - mmcls - INFO - Epoch [22][100/239]	lr: 9.723e-04, eta: 11:37:20, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9289
+2023-11-10 11:11:40,130 - mmcls - INFO - Epoch [22][150/239]	lr: 9.717e-04, eta: 11:34:43, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9232
+2023-11-10 11:12:16,062 - mmcls - INFO - Epoch [22][200/239]	lr: 9.712e-04, eta: 11:32:09, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9213
+2023-11-10 11:13:22,831 - mmcls - INFO - Epoch [23][50/239]	lr: 9.702e-04, eta: 11:24:18, time: 0.778, data_time: 0.067, memory: 20514, loss: 0.9159
+2023-11-10 11:13:58,577 - mmcls - INFO - Epoch [23][100/239]	lr: 9.696e-04, eta: 11:21:50, time: 0.715, data_time: 0.001, memory: 20514, loss: 0.9163
+2023-11-10 11:14:34,418 - mmcls - INFO - Epoch [23][150/239]	lr: 9.691e-04, eta: 11:19:25, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9140
+2023-11-10 11:15:10,372 - mmcls - INFO - Epoch [23][200/239]	lr: 9.685e-04, eta: 11:17:03, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9212
+2023-11-10 11:16:17,627 - mmcls - INFO - Epoch [24][50/239]	lr: 9.675e-04, eta: 11:09:47, time: 0.785, data_time: 0.067, memory: 20514, loss: 0.9100
+2023-11-10 11:16:53,510 - mmcls - INFO - Epoch [24][100/239]	lr: 9.669e-04, eta: 11:07:31, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9116
+2023-11-10 11:17:29,409 - mmcls - INFO - Epoch [24][150/239]	lr: 9.663e-04, eta: 11:05:17, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9095
+2023-11-10 11:18:05,391 - mmcls - INFO - Epoch [24][200/239]	lr: 9.657e-04, eta: 11:03:06, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9210
+2023-11-10 11:19:12,493 - mmcls - INFO - Epoch [25][50/239]	lr: 9.647e-04, eta: 10:56:16, time: 0.784, data_time: 0.067, memory: 20514, loss: 0.9052
+2023-11-10 11:19:48,426 - mmcls - INFO - Epoch [25][100/239]	lr: 9.640e-04, eta: 10:54:10, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9090
+2023-11-10 11:20:24,428 - mmcls - INFO - Epoch [25][150/239]	lr: 9.634e-04, eta: 10:52:07, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9070
+2023-11-10 11:21:00,363 - mmcls - INFO - Epoch [25][200/239]	lr: 9.628e-04, eta: 10:50:04, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9151
+2023-11-10 11:22:07,532 - mmcls - INFO - Epoch [26][50/239]	lr: 9.617e-04, eta: 10:43:39, time: 0.785, data_time: 0.070, memory: 20514, loss: 0.9024
+2023-11-10 11:22:43,384 - mmcls - INFO - Epoch [26][100/239]	lr: 9.611e-04, eta: 10:41:41, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9050
+2023-11-10 11:23:19,169 - mmcls - INFO - Epoch [26][150/239]	lr: 9.604e-04, eta: 10:39:45, time: 0.716, data_time: 0.001, memory: 20514, loss: 0.9085
+2023-11-10 11:23:55,072 - mmcls - INFO - Epoch [26][200/239]	lr: 9.598e-04, eta: 10:37:50, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9159
+2023-11-10 11:25:29,064 - mmcls - INFO - Epoch [27][50/239]	lr: 9.587e-04, eta: 10:31:56, time: 0.815, data_time: 0.109, memory: 20514, loss: 0.9009
+2023-11-10 11:26:05,052 - mmcls - INFO - Epoch [27][100/239]	lr: 9.580e-04, eta: 10:30:07, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.9059
+2023-11-10 11:26:42,875 - mmcls - INFO - Epoch [27][150/239]	lr: 9.573e-04, eta: 10:28:31, time: 0.757, data_time: 0.038, memory: 20514, loss: 0.9029
+2023-11-10 11:27:21,562 - mmcls - INFO - Epoch [27][200/239]	lr: 9.567e-04, eta: 10:27:01, time: 0.774, data_time: 0.058, memory: 20514, loss: 0.9050
+2023-11-10 11:28:31,932 - mmcls - INFO - Epoch [28][50/239]	lr: 9.555e-04, eta: 10:21:17, time: 0.787, data_time: 0.065, memory: 20514, loss: 0.9036
+2023-11-10 11:29:08,187 - mmcls - INFO - Epoch [28][100/239]	lr: 9.548e-04, eta: 10:19:36, time: 0.725, data_time: 0.001, memory: 20514, loss: 0.9045
+2023-11-10 11:29:44,161 - mmcls - INFO - Epoch [28][150/239]	lr: 9.541e-04, eta: 10:17:54, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9066
+2023-11-10 11:30:20,091 - mmcls - INFO - Epoch [28][200/239]	lr: 9.534e-04, eta: 10:16:13, time: 0.719, data_time: 0.002, memory: 20514, loss: 0.9074
+2023-11-10 11:31:26,948 - mmcls - INFO - Epoch [29][50/239]	lr: 9.522e-04, eta: 10:10:43, time: 0.779, data_time: 0.066, memory: 20514, loss: 0.8975
+2023-11-10 11:32:02,797 - mmcls - INFO - Epoch [29][100/239]	lr: 9.515e-04, eta: 10:09:05, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.9047
+2023-11-10 11:32:38,621 - mmcls - INFO - Epoch [29][150/239]	lr: 9.508e-04, eta: 10:07:29, time: 0.716, data_time: 0.001, memory: 20514, loss: 0.8994
+2023-11-10 11:33:14,551 - mmcls - INFO - Epoch [29][200/239]	lr: 9.501e-04, eta: 10:05:53, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.9057
+2023-11-10 11:34:21,521 - mmcls - INFO - Epoch [30][50/239]	lr: 9.488e-04, eta: 10:00:40, time: 0.782, data_time: 0.067, memory: 20514, loss: 0.9035
+2023-11-10 11:34:57,468 - mmcls - INFO - Epoch [30][100/239]	lr: 9.481e-04, eta: 9:59:08, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8987
+2023-11-10 11:35:33,321 - mmcls - INFO - Epoch [30][150/239]	lr: 9.474e-04, eta: 9:57:37, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8976
+2023-11-10 11:36:09,145 - mmcls - INFO - Epoch [30][200/239]	lr: 9.466e-04, eta: 9:56:06, time: 0.716, data_time: 0.001, memory: 20514, loss: 0.9060
+2023-11-10 11:38:11,232 - mmcls - INFO - Epoch(val) [30][394]	accuracy_top-1: 91.9168, accuracy_top-2: 95.8773
+2023-11-10 11:38:50,104 - mmcls - INFO - Epoch [31][50/239]	lr: 9.453e-04, eta: 9:51:06, time: 0.777, data_time: 0.065, memory: 20514, loss: 0.8901
+2023-11-10 11:39:26,171 - mmcls - INFO - Epoch [31][100/239]	lr: 9.446e-04, eta: 9:49:40, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.9000
+2023-11-10 11:40:02,264 - mmcls - INFO - Epoch [31][150/239]	lr: 9.438e-04, eta: 9:48:15, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.9044
+2023-11-10 11:40:38,483 - mmcls - INFO - Epoch [31][200/239]	lr: 9.431e-04, eta: 9:46:51, time: 0.724, data_time: 0.001, memory: 20514, loss: 0.9013
+2023-11-10 11:41:45,518 - mmcls - INFO - Epoch [32][50/239]	lr: 9.417e-04, eta: 9:42:05, time: 0.781, data_time: 0.068, memory: 20514, loss: 0.8985
+2023-11-10 11:42:21,574 - mmcls - INFO - Epoch [32][100/239]	lr: 9.409e-04, eta: 9:40:43, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.9007
+2023-11-10 11:42:57,421 - mmcls - INFO - Epoch [32][150/239]	lr: 9.402e-04, eta: 9:39:21, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8995
+2023-11-10 11:43:33,288 - mmcls - INFO - Epoch [32][200/239]	lr: 9.394e-04, eta: 9:37:59, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8972
+2023-11-10 11:44:39,958 - mmcls - INFO - Epoch [33][50/239]	lr: 9.380e-04, eta: 9:33:24, time: 0.778, data_time: 0.066, memory: 20514, loss: 0.8919
+2023-11-10 11:45:15,792 - mmcls - INFO - Epoch [33][100/239]	lr: 9.372e-04, eta: 9:32:05, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8953
+2023-11-10 11:45:51,564 - mmcls - INFO - Epoch [33][150/239]	lr: 9.364e-04, eta: 9:30:46, time: 0.715, data_time: 0.001, memory: 20514, loss: 0.8943
+2023-11-10 11:46:27,388 - mmcls - INFO - Epoch [33][200/239]	lr: 9.356e-04, eta: 9:29:27, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8989
+2023-11-10 11:47:34,038 - mmcls - INFO - Epoch [34][50/239]	lr: 9.342e-04, eta: 9:25:04, time: 0.778, data_time: 0.064, memory: 20514, loss: 0.8929
+2023-11-10 11:48:09,956 - mmcls - INFO - Epoch [34][100/239]	lr: 9.334e-04, eta: 9:23:49, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9011
+2023-11-10 11:48:45,844 - mmcls - INFO - Epoch [34][150/239]	lr: 9.326e-04, eta: 9:22:34, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.8942
+2023-11-10 11:49:21,763 - mmcls - INFO - Epoch [34][200/239]	lr: 9.317e-04, eta: 9:21:19, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.9054
+2023-11-10 11:50:28,908 - mmcls - INFO - Epoch [35][50/239]	lr: 9.303e-04, eta: 9:17:09, time: 0.787, data_time: 0.065, memory: 20514, loss: 0.8921
+2023-11-10 11:51:04,898 - mmcls - INFO - Epoch [35][100/239]	lr: 9.294e-04, eta: 9:15:57, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8972
+2023-11-10 11:51:40,817 - mmcls - INFO - Epoch [35][150/239]	lr: 9.286e-04, eta: 9:14:45, time: 0.718, data_time: 0.001, memory: 20514, loss: 0.8968
+2023-11-10 11:52:16,778 - mmcls - INFO - Epoch [35][200/239]	lr: 9.277e-04, eta: 9:13:34, time: 0.720, data_time: 0.002, memory: 20514, loss: 0.9008
+2023-11-10 11:53:23,773 - mmcls - INFO - Epoch [36][50/239]	lr: 9.262e-04, eta: 9:09:31, time: 0.780, data_time: 0.066, memory: 20514, loss: 0.8903
+2023-11-10 11:53:59,763 - mmcls - INFO - Epoch [36][100/239]	lr: 9.254e-04, eta: 9:08:21, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8887
+2023-11-10 11:54:35,749 - mmcls - INFO - Epoch [36][150/239]	lr: 9.245e-04, eta: 9:07:13, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8903
+2023-11-10 11:55:11,722 - mmcls - INFO - Epoch [36][200/239]	lr: 9.236e-04, eta: 9:06:04, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8965
+2023-11-10 11:56:18,828 - mmcls - INFO - Epoch [37][50/239]	lr: 9.221e-04, eta: 9:02:11, time: 0.783, data_time: 0.072, memory: 20514, loss: 0.8892
+2023-11-10 11:56:54,768 - mmcls - INFO - Epoch [37][100/239]	lr: 9.212e-04, eta: 9:01:04, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8886
+2023-11-10 11:57:30,728 - mmcls - INFO - Epoch [37][150/239]	lr: 9.203e-04, eta: 8:59:58, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8886
+2023-11-10 11:58:06,678 - mmcls - INFO - Epoch [37][200/239]	lr: 9.194e-04, eta: 8:58:52, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8928
+2023-11-10 11:59:20,350 - mmcls - INFO - Epoch [38][50/239]	lr: 9.178e-04, eta: 8:55:36, time: 0.916, data_time: 0.147, memory: 20514, loss: 0.8958
+2023-11-10 12:00:21,874 - mmcls - INFO - Epoch [38][100/239]	lr: 9.169e-04, eta: 8:56:22, time: 1.230, data_time: 0.107, memory: 20514, loss: 0.8894
+2023-11-10 12:02:40,643 - mmcls - INFO - Epoch [38][150/239]	lr: 9.160e-04, eta: 9:02:41, time: 2.775, data_time: 0.004, memory: 20514, loss: 0.8977
+2023-11-10 12:07:38,167 - mmcls - INFO - Epoch [38][200/239]	lr: 9.151e-04, eta: 9:20:14, time: 5.950, data_time: 0.001, memory: 20514, loss: 0.8962
+2023-11-10 12:14:52,517 - mmcls - INFO - Epoch [39][50/239]	lr: 9.135e-04, eta: 9:29:11, time: 4.444, data_time: 3.767, memory: 20514, loss: 0.8897
+2023-11-10 12:18:35,416 - mmcls - INFO - Epoch [39][100/239]	lr: 9.126e-04, eta: 9:40:59, time: 4.458, data_time: 3.777, memory: 20514, loss: 0.8913
+2023-11-10 12:22:33,423 - mmcls - INFO - Epoch [39][150/239]	lr: 9.117e-04, eta: 9:53:39, time: 4.760, data_time: 4.079, memory: 20514, loss: 0.8939
+2023-11-10 12:26:04,874 - mmcls - INFO - Epoch [39][200/239]	lr: 9.107e-04, eta: 10:04:19, time: 4.229, data_time: 3.549, memory: 20514, loss: 0.8959
+2023-11-10 12:31:26,051 - mmcls - INFO - Epoch [40][50/239]	lr: 9.091e-04, eta: 10:07:32, time: 3.025, data_time: 1.579, memory: 20514, loss: 0.8845
+2023-11-10 12:34:07,165 - mmcls - INFO - Epoch [40][100/239]	lr: 9.081e-04, eta: 10:14:28, time: 3.222, data_time: 1.333, memory: 20514, loss: 0.8922
+2023-11-10 12:39:05,274 - mmcls - INFO - Epoch [40][150/239]	lr: 9.072e-04, eta: 10:30:30, time: 5.952, data_time: 2.256, memory: 20514, loss: 0.8922
+2023-11-10 12:44:06,494 - mmcls - INFO - Epoch [40][200/239]	lr: 9.062e-04, eta: 10:46:35, time: 6.034, data_time: 2.644, memory: 20514, loss: 0.8980
+2023-11-10 12:59:18,947 - mmcls - INFO - Epoch(val) [40][394]	accuracy_top-1: 90.8216, accuracy_top-2: 95.3935
+2023-11-10 13:06:55,665 - mmcls - INFO - Epoch [41][50/239]	lr: 9.045e-04, eta: 11:09:15, time: 9.103, data_time: 8.403, memory: 20514, loss: 0.8859
+2023-11-10 13:13:08,455 - mmcls - INFO - Epoch [41][100/239]	lr: 9.036e-04, eta: 11:29:26, time: 7.454, data_time: 6.731, memory: 20514, loss: 0.8867
+2023-11-10 13:19:14,323 - mmcls - INFO - Epoch [41][150/239]	lr: 9.026e-04, eta: 11:48:55, time: 7.319, data_time: 6.641, memory: 20514, loss: 0.8824
+2023-11-10 13:24:25,957 - mmcls - INFO - Epoch [41][200/239]	lr: 9.016e-04, eta: 12:04:36, time: 6.233, data_time: 5.554, memory: 20514, loss: 0.8950
+2023-11-10 13:34:15,327 - mmcls - INFO - Epoch [42][50/239]	lr: 8.999e-04, eta: 12:18:22, time: 6.850, data_time: 5.555, memory: 20514, loss: 0.8863
+2023-11-10 13:39:25,214 - mmcls - INFO - Epoch [42][100/239]	lr: 8.989e-04, eta: 12:33:27, time: 6.202, data_time: 5.231, memory: 20514, loss: 0.8945
+2023-11-10 13:48:40,295 - mmcls - INFO - Epoch [42][150/239]	lr: 8.979e-04, eta: 13:03:49, time: 11.085, data_time: 9.227, memory: 20514, loss: 0.8836
+2023-11-10 13:54:44,456 - mmcls - INFO - Epoch [42][200/239]	lr: 8.969e-04, eta: 13:21:52, time: 7.300, data_time: 6.541, memory: 20514, loss: 0.8910
+2023-11-10 14:00:00,471 - mmcls - INFO - Epoch [43][50/239]	lr: 8.951e-04, eta: 13:21:24, time: 2.720, data_time: 2.027, memory: 20514, loss: 0.8821
+2023-11-10 14:02:01,477 - mmcls - INFO - Epoch [43][100/239]	lr: 8.941e-04, eta: 13:23:53, time: 2.420, data_time: 1.528, memory: 20514, loss: 0.8816
+2023-11-10 14:03:51,298 - mmcls - INFO - Epoch [43][150/239]	lr: 8.931e-04, eta: 13:25:38, time: 2.196, data_time: 1.212, memory: 20514, loss: 0.8937
+2023-11-10 14:05:39,911 - mmcls - INFO - Epoch [43][200/239]	lr: 8.921e-04, eta: 13:27:16, time: 2.172, data_time: 1.214, memory: 20514, loss: 0.8915
+2023-11-10 14:07:37,615 - mmcls - INFO - Epoch [44][50/239]	lr: 8.903e-04, eta: 13:20:45, time: 0.772, data_time: 0.066, memory: 20514, loss: 0.8811
+2023-11-10 14:08:13,302 - mmcls - INFO - Epoch [44][100/239]	lr: 8.893e-04, eta: 13:17:59, time: 0.714, data_time: 0.001, memory: 20514, loss: 0.8861
+2023-11-10 14:08:49,170 - mmcls - INFO - Epoch [44][150/239]	lr: 8.883e-04, eta: 13:15:14, time: 0.717, data_time: 0.001, memory: 20514, loss: 0.8919
+2023-11-10 14:09:25,106 - mmcls - INFO - Epoch [44][200/239]	lr: 8.872e-04, eta: 13:12:31, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8896
+2023-11-10 14:10:32,453 - mmcls - INFO - Epoch [45][50/239]	lr: 8.854e-04, eta: 13:06:17, time: 0.787, data_time: 0.070, memory: 20514, loss: 0.8817
+2023-11-10 14:11:08,516 - mmcls - INFO - Epoch [45][100/239]	lr: 8.843e-04, eta: 13:03:38, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8861
+2023-11-10 14:11:44,518 - mmcls - INFO - Epoch [45][150/239]	lr: 8.833e-04, eta: 13:01:00, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8845
+2023-11-10 14:12:20,486 - mmcls - INFO - Epoch [45][200/239]	lr: 8.822e-04, eta: 12:58:23, time: 0.719, data_time: 0.001, memory: 20514, loss: 0.8873
+2023-11-10 14:13:27,628 - mmcls - INFO - Epoch [46][50/239]	lr: 8.804e-04, eta: 12:52:21, time: 0.784, data_time: 0.065, memory: 20514, loss: 0.8820
+2023-11-10 14:14:03,704 - mmcls - INFO - Epoch [46][100/239]	lr: 8.793e-04, eta: 12:49:48, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8829
+2023-11-10 14:14:39,770 - mmcls - INFO - Epoch [46][150/239]	lr: 8.782e-04, eta: 12:47:16, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8858
+2023-11-10 14:15:15,811 - mmcls - INFO - Epoch [46][200/239]	lr: 8.772e-04, eta: 12:44:45, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8880
+2023-11-10 14:16:22,852 - mmcls - INFO - Epoch [47][50/239]	lr: 8.752e-04, eta: 12:38:55, time: 0.781, data_time: 0.065, memory: 20514, loss: 0.8801
+2023-11-10 14:16:58,915 - mmcls - INFO - Epoch [47][100/239]	lr: 8.742e-04, eta: 12:36:28, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8796
+2023-11-10 14:17:34,897 - mmcls - INFO - Epoch [47][150/239]	lr: 8.731e-04, eta: 12:34:01, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8861
+2023-11-10 14:18:10,912 - mmcls - INFO - Epoch [47][200/239]	lr: 8.720e-04, eta: 12:31:35, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8896
+2023-11-10 14:19:18,079 - mmcls - INFO - Epoch [48][50/239]	lr: 8.700e-04, eta: 12:25:57, time: 0.784, data_time: 0.064, memory: 20514, loss: 0.8774
+2023-11-10 14:19:54,242 - mmcls - INFO - Epoch [48][100/239]	lr: 8.689e-04, eta: 12:23:35, time: 0.724, data_time: 0.001, memory: 20514, loss: 0.8831
+2023-11-10 14:20:30,223 - mmcls - INFO - Epoch [48][150/239]	lr: 8.678e-04, eta: 12:21:14, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8787
+2023-11-10 14:21:06,241 - mmcls - INFO - Epoch [48][200/239]	lr: 8.667e-04, eta: 12:18:53, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8859
+2023-11-10 14:22:13,413 - mmcls - INFO - Epoch [49][50/239]	lr: 8.647e-04, eta: 12:13:26, time: 0.784, data_time: 0.067, memory: 20514, loss: 0.8826
+2023-11-10 14:22:49,477 - mmcls - INFO - Epoch [49][100/239]	lr: 8.636e-04, eta: 12:11:09, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8816
+2023-11-10 14:23:25,555 - mmcls - INFO - Epoch [49][150/239]	lr: 8.625e-04, eta: 12:08:52, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8835
+2023-11-10 14:24:01,615 - mmcls - INFO - Epoch [49][200/239]	lr: 8.614e-04, eta: 12:06:36, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8819
+2023-11-10 14:25:08,894 - mmcls - INFO - Epoch [50][50/239]	lr: 8.594e-04, eta: 12:01:20, time: 0.784, data_time: 0.068, memory: 20514, loss: 0.8893
+2023-11-10 14:25:44,893 - mmcls - INFO - Epoch [50][100/239]	lr: 8.582e-04, eta: 11:59:06, time: 0.720, data_time: 0.001, memory: 20514, loss: 0.8816
+2023-11-10 14:26:21,006 - mmcls - INFO - Epoch [50][150/239]	lr: 8.571e-04, eta: 11:56:54, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8751
+2023-11-10 14:26:57,036 - mmcls - INFO - Epoch [50][200/239]	lr: 8.559e-04, eta: 11:54:43, time: 0.721, data_time: 0.001, memory: 20514, loss: 0.8814
+2023-11-10 14:27:25,065 - mmcls - INFO - Saving checkpoint at 50 epochs
+2023-11-10 14:29:08,165 - mmcls - INFO - Epoch(val) [50][394]	accuracy_top-1: 90.7913, accuracy_top-2: 95.2659
+2023-11-10 14:29:47,570 - mmcls - INFO - Epoch [51][50/239]	lr: 8.539e-04, eta: 11:49:37, time: 0.788, data_time: 0.066, memory: 20514, loss: 0.8849
+2023-11-10 14:30:24,030 - mmcls - INFO - Epoch [51][100/239]	lr: 8.527e-04, eta: 11:47:29, time: 0.729, data_time: 0.001, memory: 20514, loss: 0.8850
+2023-11-10 14:31:00,323 - mmcls - INFO - Epoch [51][150/239]	lr: 8.516e-04, eta: 11:45:21, time: 0.726, data_time: 0.001, memory: 20514, loss: 0.8777
+2023-11-10 14:31:36,676 - mmcls - INFO - Epoch [51][200/239]	lr: 8.504e-04, eta: 11:43:15, time: 0.727, data_time: 0.001, memory: 20514, loss: 0.8823
+2023-11-10 14:32:44,023 - mmcls - INFO - Epoch [52][50/239]	lr: 8.483e-04, eta: 11:38:18, time: 0.786, data_time: 0.070, memory: 20514, loss: 0.8798
+2023-11-10 14:33:20,173 - mmcls - INFO - Epoch [52][100/239]	lr: 8.472e-04, eta: 11:36:13, time: 0.723, data_time: 0.001, memory: 20514, loss: 0.8784
+2023-11-10 14:33:56,289 - mmcls - INFO - Epoch [52][150/239]	lr: 8.460e-04, eta: 11:34:09, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8787
+2023-11-10 14:34:32,411 - mmcls - INFO - Epoch [52][200/239]	lr: 8.448e-04, eta: 11:32:06, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8788
+2023-11-10 14:35:39,690 - mmcls - INFO - Epoch [53][50/239]	lr: 8.427e-04, eta: 11:27:17, time: 0.785, data_time: 0.067, memory: 20514, loss: 0.8752
+2023-11-10 14:36:15,766 - mmcls - INFO - Epoch [53][100/239]	lr: 8.415e-04, eta: 11:25:16, time: 0.722, data_time: 0.001, memory: 20514, loss: 0.8753

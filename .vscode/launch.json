@@ -1,0 +1,67 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
+            // "program": "${file}",
+            // "program": "work_dirs/swin_tiny/Experience3/Test_Cluster/get_competition.py",
+            // "program": "tools/analysis_tools/analyze_results.py",
+            // "program": "tools/cluster.py",
+            // "program": "tools/cluster_class.py",
+            // "program": "tools/test.py",
+            // "program": "tools/train.py",
+            // "program": "tools/train.py",
+            // "program": "tools/CleanData.py",
+            "program": "tools/getclass.py",
+            // "console": "integratedTerminal",
+            "justMyCode": true,
+            
+            // getclass
+            "args": ["work_dirs/swin_tiny/Experience7/Mix_small_fake/jml_improve.py","/data4/lj/Classification/1.7/epoch_60.pth"]
+
+            // cluster
+            // "args": ["work_dirs/swin_tiny/Experience7/Mix_small_fake/jml_improve.py","work_dirs/swin_tiny/Experience3/Test_Cluster/best_accuracy_top-1_epoch_36.pth"]
+            // "args": ["/data4/lj/Classification/1.7/work_dirs/Get_Class/swin_transformer_128.py","/data4/lj/Classification/1.7/work_dirs/Get_Class/epoch_30.pth"]
+
+            // CleaanData
+            // "args": ["/data4/lj/Classification/1.7/work_dirs/swin_tiny/Forgery_Detect/Sk.py","/data4/lj/Classification/1.7/Classification/1.7/work_dirs/swin_tiny/Forgery_Detect/epoch_30.pth"]
+
+
+            // train
+            // "args": ["work_dirs/swin_tiny/Tongyi/tongyi_improve.py"]
+            // "args": ["work_dirs/swin_tiny/SK/Sk.py"]
+            // "args": ["work_dirs/swin_tiny/Experience3/Test_Cluster/jml_improve.py"]
+            // "args": ["work_dirs/swin_tiny/JML_Crop_Bbox_Shrank/jml_improve.py","work_dirs/swin_tiny/JML_Crop_Bbox_Shrank/JML_Crop_Bbox_Shrank_100.pth"]
+            
+            // test
+            // "args": ["work_dirs/swin_tiny/Crop/swin-tiny_16xb64_in1k.py","work_dirs/swin_tiny/Crop/epoch_100.pth","--show-dir","/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Crop/Test_folder","--out","/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Crop/Test_folder/result.pkl"]
+            // "args": ["work_dirs/efficientnet-b3_8xb32_in1k/Crop/efficientnet-b3_8xb32_in1k.py","work_dirs/efficientnet-b3_8xb32_in1k/Crop/epoch_100.pth","--show-dir","/home/common/linjie/Classification/1.4/work_dirs/efficientnet-b3_8xb32_in1k/Crop/Test_folder","--out","/home/common/linjie/Classification/1.4/work_dirs/efficientnet-b3_8xb32_in1k/Crop/Test_folder/result.pkl"]
+            // "args": ["work_dirs/swin_tiny/Mask_Realist_Remake/swin-tiny_16xb64_in1k.py","work_dirs/swin_tiny/Mask_Realist_Remake/epoch_100.pth","--show-dir","work_dirs/swin_tiny/Mask_Realist_Remake/Test_folder","--out","work_dirs/swin_tiny/Mask_Realist_Remake/Test_folder/result.pkl"]
+            // "args": ["work_dirs/swin-small_16xb64_in1k/swin-small_16xb64_in1k.py","work_dirs/swin-small_16xb64_in1k/img_size_128_epoch_100.pth","--show-dir","/home/common/linjie/Classification/1.4/work_dirs/swin-small_16xb64_in1k/Test_folder","--out","/home/common/linjie/Classification/1.4/work_dirs/swin-small_16xb64_in1k/Test_folder/result.pkl"]
+            // "args": ["work_dirs/swin-base_16xb64_in1k-384px/swin-base_16xb64_in1k-384px.py","work_dirs/swin-base_16xb64_in1k-384px/JiePad_epoch_100.pth","--show-dir","work_dirs/swin-base_16xb64_in1k-384px/Test_folder","--out","work_dirs/swin-base_16xb64_in1k-384px/Test_folder/result.pkl"]
+            // "args": ["work_dirs/swin_tiny/Rectification_Crop_JiePad/swin-tiny_16xb64_in1k.py","work_dirs/swin_tiny/Rectification_Crop_JiePad/epoch_100.pth","--show-dir","work_dirs/swin_tiny/Rectification_Crop_JiePad/Test_folder","--out","work_dirs/swin_tiny/Rectification_Crop_JiePad/Test_folder/result.pkl"]
+            // "args": ["work_dirs/swin_tiny/JML_Crop_Bbox_Shrank/jml_improve.py","work_dirs/swin_tiny/JML_Crop_Bbox_Shrank/JML_Crop_Bbox_Shrank_100.pth"]
+
+
+
+            // analyze_result
+            // "args": ["/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Crop/swin-tiny_16xb64_in1k.py","/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Crop/Test_folder/result.pkl","--out-dir","/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Crop/Analyze_result"]
+            // "args": ["work_dirs/efficientnet-b3_8xb32_in1k/Crop/efficientnet-b3_8xb32_in1k.py","/home/common/linjie/Classification/1.4/work_dirs/efficientnet-b3_8xb32_in1k/Crop/Test_folder/result.pkl","--out-dir","/home/common/linjie/Classification/1.4/work_dirs/efficientnet-b3_8xb32_in1k/Crop/Analyze_result"]
+            // "args": ["work_dirs/swin_tiny/Mask_Realist_Remake/swin-tiny_16xb64_in1k.py","work_dirs/swin_tiny/Mask_Realist_Remake/Test_folder/result.pkl","--out-dir","/home/common/linjie/Classification/1.4/work_dirs/swin_tiny/Mask_Realist_Remake/Analyze_result"]
+            // "args": ["work_dirs/swin-small_16xb64_in1k/swin-small_16xb64_in1k.py","work_dirs/swin-small_16xb64_in1k/Test_folder/result.pkl","--out-dir","/home/common/linjie/Classification/1.4/work_dirs/swin-small_16xb64_in1k/Analyze_result"]
+            // "args": ["work_dirs/swin-base_16xb64_in1k-384px/swin-base_16xb64_in1k-384px.py","work_dirs/swin-base_16xb64_in1k-384px/Test_folder/result.pkl","--out-dir","work_dirs/swin-base_16xb64_in1k-384px/Analyze_result"]
+            // "args": ["work_dirs/swin_tiny/Rectification_Crop_JiePad/swin-tiny_16xb64_in1k.py","work_dirs/swin_tiny/Rectification_Crop_JiePad/Test_folder/result.pkl","--out-dir","work_dirs/swin_tiny/Rectification_Crop_JiePad/Analyze_result"]
+
+            
+        }
+    ]
+}
